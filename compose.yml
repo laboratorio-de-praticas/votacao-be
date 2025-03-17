@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # Node.js service
+  node-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: node-app
+    ports:
+      - "3000:3000"  # Adjust to your app's port
+    volumes:
+      - .:/app  # Mount current directory to /app inside the container
+    environment:
+      - DB_HOST=${DB_HOST}  # Reference system environment variables
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    depends_on:
+      - db
+
+  # PostgreSQL service
+  db:
+    image: postgres:17.4-alpine3.21
+    container_name: postgres-db
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}  # Reference system environment variables
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5432:5432"  # Exposing PostgreSQL port
+    volumes:
+      - postgres-data:/var/lib/postgresql/data  # Persist data
+
+# Volumes for persistent storage
+volumes:
+  postgres-data:
+
