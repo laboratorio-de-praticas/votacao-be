@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "npx nodemon index.js",
     "dev": "nodemon index.js"
   },
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -15,5 +16,13 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laboratorio-de-praticas/votacao-be.git"
+  },
+  "bugs": {
+    "url": "https://github.com/laboratorio-de-praticas/votacao-be/issues"
+  },
+  "homepage": "https://github.com/laboratorio-de-praticas/votacao-be#readme"
 }

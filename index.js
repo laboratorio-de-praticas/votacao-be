@@ -1,7 +1,17 @@
-const express = require('express')
+import express from 'express'
+
 const app = express()
-const port = 3000
 
-app.get('/', (req, res) => res.send('Hello World!'))
+app.get("/", (req, res) =>{
+    res.send("Serviço iniciado com sucesso")
+})
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+const port = 4000
+
+app.listen(port, (error)=>{
+    if(error){
+        console.log(error)
+    }else{
+        console.log(`Serviço iniciado em http://localhost:${port}`)
+    }
+})
