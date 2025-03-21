@@ -77,5 +77,5 @@ O backend estará rodando em `http://localhost:3000`.
 
 ---
 
-📌 **Desenvolvido para proporcionar uma votação segura e transparente!**
 
+📌 **Desenvolvido para proporcionar uma votação segura e transparente!**
