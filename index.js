@@ -1,9 +1,10 @@
 import express from 'express'
-import router from './routes/votacaoPublicaController.js';
 
 const app = express()
 
-app.use('/', router);
+app.get("/", (req, res) =>{
+    res.send("Serviço iniciado com sucesso")
+})
 
 const port = 3000
 
