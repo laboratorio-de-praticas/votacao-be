@@ -2,8 +2,8 @@
   <a href="https://fatecregistro.cps.sp.gov.br/" target="blank"><img src="https://bkpsitecpsnew.blob.core.windows.net/uploadsitecps/sites/40/2024/03/fatec_registro.png" width="300" alt="Fatec Logo" /></a>
 </p>
 
-  <p align="center">Laboratório de Práticas é de realização da <a href="https://fatecregistro.cps.sp.gov.br/" target="_blank">Fatec Registro</a> com o objetivo de acrescentar aos alunos um portfólio, e não menos importante, experiência!</p>
-    <p align="center">
+<p align="center">Laboratório de Práticas é de realização da <a href="https://fatecregistro.cps.sp.gov.br/" target="_blank">Fatec Registro</a> com o objetivo de acrescentar aos alunos um portfólio e, não menos importante, experiência!</p>
+<p align="center">
 <a href="https://www.instagram.com/fatecregistro/" target="_blank"><img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Fatec Registro Instagram" /></a>
 </p>
 
@@ -65,17 +65,16 @@ O backend estará rodando em `http://localhost:3000`.
 ### 🏆 Votação dos Projetos na Feira
 
 - A votação será feita através de um **QR Code** disponível na bancada de cada equipe.
-- Cada visitante poderá votar em **apenas um projeto**.
+- Cada visitante poderá votar em quantos projetos quiser, desde que seja um único voto por projeto.
 - Visitantes deverão fazer um **check-in** na recepção da feira com seu telefone.
 - Para votar, o visitante informará seu telefone para validação.
 
 ### 🗳️ Tela de Votação
 
-- A interface da votação conterá apenas um botão para registrar o voto.
-- Além do voto, haverá **5 perguntas de avaliação**.
-- As perguntas seguirão um critério de resposta: “ruim”, “bom” e “ótimo” (detalhes ainda a serem definidos).
-
----
-
+- Para **alunos e convidados**, a tela conterá as informações do representante ou projeto, junto com o botão de "Votar".
+- Para **avaliadores externos**, a tela conterá os tópicos citados anteriormente, além de **2 critérios de avaliação**:
+  - **Projeto acolhedor** (avaliado em até 5 estrelas).
+  - **Projeto inovador** (avaliado em até 5 estrelas).
+  - Caixa de comentário opcional para feedback.
 
 📌 **Desenvolvido para proporcionar uma votação segura e transparente!**
