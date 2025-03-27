@@ -22,3 +22,11 @@ app.listen(port, (error) => {
     console.log(`Serviço iniciado em http://localhost:${port}`);
   }
 });
+
+app.listen(port, (error)=>{
+    if(error){
+        console.log(error)
+    }else{
+        console.log(`Serviço iniciado em http://localhost:${port}`)
+    }
+})
