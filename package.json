@@ -1,7 +1,7 @@
 {
   "name": "votacao-be",
   "version": "1.0.0",
-  "description": "",
+  "description": "<p align=\"center\">   <a href=\"https://fatecregistro.cps.sp.gov.br/\" target=\"blank\"><img src=\"https://bkpsitecpsnew.blob.core.windows.net/uploadsitecps/sites/40/2024/03/fatec_registro.png\" width=\"300\" alt=\"Fatec Logo\" /></a> </p>",
   "main": "index.js",
   "scripts": {
     "start": "npx nodemon index.js",
@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.21.2",
     "pg": "^8.14.1"
   },
