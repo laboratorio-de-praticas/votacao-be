@@ -1,6 +1,6 @@
 import express from 'express';
 import votacaoInternaRoutes from './routes/votacaoInternaRoute.js'; 
-import cors from "cors"
+import cors from 'cors'
 
 const app = express();
 const port = 3000;
