@@ -1,30 +1,29 @@
-import votoInterno from "../modules/votacaoInterna.js";
+import pool from "../config/db.js"  
 
-class votacaoInterna{
+async function verificarERegistrarVoto(id_candidato, id_participante, id_evento) {
+  try {
+    // Verificando se o aluno já realizou o voto
+    const queryVerificar = 
+    `select * from Votos where id_participante = $1 and id_evento = $2;`
 
-  async registrarVoto (votoInterno) {
-    console.log("Voto registrado:", votoInterno); // Simulando o registro do voto
-    return true;
-  };
+    const resultadoVerificacao = await pool.query(queryVerificar, [id_participante, id_evento])
 
-  async consultarVoto(id_participante) {
-    try {
-
-      // Realiza a consulta SQL para verficar se o aluno tem voto registrado
-      const query = `select * from Votos where id_participante = $1;`
-  
-      const resultado = await client.query(query, [id_participante])
-      
-      // Retorna o voto localizado
-      return resultado.rows[0]
-  
-    } catch (error) {
-      console.error("Erro ao consultar voto:", error)
+    // Caso o aluno tenha votado, retornar uma mensagem alertando que o voto já foi realizado
+    if (resultadoVerificacao.rows.length > 0) {
+      return { sucesso: false, mensagem: "O aluno já realizou o voto." }
     }
-  }
-  
 
+    // Caso o aluno não tenha votado, registrar o voto no banco
+    const queryRegistrar = 
+    `insert into Votos (id_candidato, id_participante, id_evento) values ($1, $2, $3);`
+    await pool.query(queryRegistrar, [id_candidato, id_participante, id_evento])
+
+    // Retornar uma mensagem de sucesso depois de inserir no banco
+    return { sucesso: true, mensagem: "Voto registrado com sucesso!" }
+  } catch (error) {
+    console.error(error)
+    return { sucesso: false, mensagem: "Erro ao processar a solicitação." }
+  }
 }
 
-export default votacaoInterna
-
+export default verificarERegistrarVoto

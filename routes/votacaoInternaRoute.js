@@ -1,12 +1,12 @@
-import express from 'express';
-import {confirmarVoto, verificarVoto} from '../controllers/votacaoInternaController.js';
+import express from 'express'
+import { confirmarVoto, conferirVoto } from '../controllers/votacaoInternaController.js'
 
-const router = express.Router();
+const router = express.Router()
 
 // Rota POST para registrar voto
-router.get('/votacao/interna/confirmacao', confirmarVoto);
+router.post('/votacao/interna/confirmacao', confirmarVoto)
 
 // Rota POST para verificar o voto
-router.get('/votacao/interna/confirmacao/validacao', verificarVoto)
+router.post('/votacao/interna/confirmacao/validacao', conferirVoto)
 
-export default router;
+export default router
