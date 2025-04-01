@@ -17,11 +17,3 @@ app.use(votacaoPublica)
 app.get("/", (req, res) => {
   res.send("Serviço iniciado com sucesso");
 });
-
-app.listen(port, (error) => {
-  if (error) {
-    console.log(error);
-  } else {
-    console.log(`Serviço iniciado em http://localhost:${port}`);
-  }
-});
