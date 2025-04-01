@@ -1,0 +1,164 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model alunos {
+  id_aluno       Int             @id @default(autoincrement())
+  foto_url       String?         @db.VarChar(300)
+  data_ingresso  DateTime?       @db.Timestamp(6)
+  data_criacao   DateTime?       @default(now()) @db.Timestamp(6)
+  data_alteracao DateTime?       @default(now()) @db.Timestamp(6)
+  curso_semestre String?         @db.VarChar(50)
+  fk_id_usuario  Int?
+  usuarios       usuarios?       @relation(fields: [fk_id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  candidato      candidato[]
+  participantes  participantes[]
+}
+
+model candidato {
+  id                 Int                @id @default(autoincrement())
+  id_aluno           Int?
+  id_projeto         Int?
+  qrcode             String?            @db.VarChar(255)
+  situacao_candidato candidatosituacao?
+  data_criacao       DateTime?          @default(now()) @db.Timestamp(6)
+  data_alteracao     DateTime?          @default(now()) @db.Timestamp(6)
+  alunos             alunos?            @relation(fields: [id_aluno], references: [id_aluno], onDelete: NoAction, onUpdate: NoAction)
+  projetos           projetos?          @relation(fields: [id_projeto], references: [id_projeto], onDelete: NoAction, onUpdate: NoAction)
+  votos              votos[]
+}
+
+model categorias {
+  id_categoria        Int                   @id @default(autoincrement())
+  nome                String?               @db.VarChar(120)
+  descricao           String?
+  data_criacao        DateTime?             @default(now()) @db.Timestamp(6)
+  data_alteracao      DateTime?             @default(now()) @db.Timestamp(6)
+  categorias_projetos categorias_projetos[]
+}
+
+model categorias_projetos {
+  id              Int         @id @default(autoincrement())
+  fk_id_projeto   Int?
+  fk_id_categoria Int?
+  data_criacao    DateTime?   @default(now()) @db.Timestamp(6)
+  data_alteracao  DateTime?   @default(now()) @db.Timestamp(6)
+  categorias      categorias? @relation(fields: [fk_id_categoria], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction)
+  projetos        projetos?   @relation(fields: [fk_id_projeto], references: [id_projeto], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([id, fk_id_projeto, fk_id_categoria])
+}
+
+model eventos {
+  id_evento        Int             @id @default(autoincrement())
+  tipo_evento      eventotipos?
+  nome_evento      String?         @db.VarChar(255)
+  descricao_evento String?
+  status_evento    eventostatus?
+  curso_semestre   String?         @db.VarChar(50)
+  data_inicio      DateTime?       @db.Timestamp(6)
+  data_fim         DateTime?       @db.Timestamp(6)
+  data_criacao     DateTime?       @default(now()) @db.Timestamp(6)
+  data_alteracao   DateTime?       @default(now()) @db.Timestamp(6)
+  participantes    participantes[]
+  votos            votos[]
+}
+
+model fotos_projetos {
+  id_foto_projeto Int       @id @default(autoincrement())
+  foto_url        String?   @db.VarChar(300)
+  foto_extensao   String?   @db.VarChar(30)
+  fk_id_projeto   Int?
+  data_criacao    DateTime? @default(now()) @db.Timestamp(6)
+  data_alteracao  DateTime? @default(now()) @db.Timestamp(6)
+  projetos        projetos? @relation(fields: [fk_id_projeto], references: [id_projeto], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model participantes {
+  id_participante Int         @id @default(autoincrement())
+  id_aluno        Int?
+  id_visitante    Int?
+  id_evento       Int?
+  avaliador       Boolean?
+  alunos          alunos?     @relation(fields: [id_aluno], references: [id_aluno], onDelete: NoAction, onUpdate: NoAction)
+  eventos         eventos?    @relation(fields: [id_evento], references: [id_evento], onDelete: NoAction, onUpdate: NoAction)
+  visitantes      visitantes? @relation(fields: [id_visitante], references: [id_visitante], onDelete: NoAction, onUpdate: NoAction)
+  votos           votos[]
+}
+
+model projetos {
+  id_projeto          Int                   @id @default(autoincrement())
+  titulo              String                @db.VarChar(255)
+  descricao           String                @db.VarChar(200)
+  data_criacao        DateTime?             @default(now()) @db.Timestamp(6)
+  data_alteracao      DateTime?             @default(now()) @db.Timestamp(6)
+  candidato           candidato[]
+  categorias_projetos categorias_projetos[]
+  fotos_projetos      fotos_projetos[]
+}
+
+model usuarios {
+  id                  Int            @id @default(autoincrement())
+  nome                String?        @db.VarChar(250)
+  senha               String?        @db.VarChar(400)
+  email_institucional String?        @db.VarChar(250)
+  tipo_usuario        usuariotipos?
+  status_usuario      usuariostatus?
+  data_criacao        DateTime?      @default(now()) @db.Timestamp(6)
+  data_alteracao      DateTime?      @default(now()) @db.Timestamp(6)
+  alunos              alunos[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model visitantes {
+  id_visitante    Int             @id @default(autoincrement())
+  nome_social     String?         @db.VarChar(200)
+  celular         String?         @db.VarChar(12)
+  data_nascimento DateTime?       @db.Timestamp(6)
+  chave_acesso    String?         @db.VarChar(4)
+  participantes   participantes[]
+}
+
+model votos {
+  id_voto         Int            @id @default(autoincrement())
+  id_candidato    Int?
+  id_participante Int?
+  id_evento       Int?
+  candidato       candidato?     @relation(fields: [id_candidato], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  eventos         eventos?       @relation(fields: [id_evento], references: [id_evento], onDelete: NoAction, onUpdate: NoAction)
+  participantes   participantes? @relation(fields: [id_participante], references: [id_participante], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum candidatosituacao {
+  Pendente
+  Ativo
+  Encerrado
+}
+
+enum eventostatus {
+  Ativo
+  Em_Preparo
+  Em_Contagem
+  Finalizado
+}
+
+enum eventotipos {
+  Externo
+  Interno
+}
+
+enum usuariostatus {
+  Pendente
+  Ativo
+  Desligado
+}
+
+enum usuariotipos {
+  Admin
+  Atendente
+}

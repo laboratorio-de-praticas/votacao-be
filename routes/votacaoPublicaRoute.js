@@ -1,7 +1,7 @@
-import express from 'express'
-const router = express.Router();
-import getHome from '../controllers/votacaoPublicaController.js'
-
-router.get('/', getHome);
-
-export default router;
+import express from "express";
+const votoRoutes = express.Router();
+import votacaoPublicaController from "../controllers/votacaoPublicaController"; "../controllers/votacaoPublicaController.js";
+ 
+votoRoutes.post("/votacao/publica/confirmacao/avaliador", votacaoPublicaController.registrarVotoAvaliador);
+ 
+ export default votoRoutes;

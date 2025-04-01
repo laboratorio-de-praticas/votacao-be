@@ -1,12 +1,14 @@
-import getWelcomeMessage from '../services/votacaoPublicaService.js'
-
-const getHome = (req, res) => {
+import votacaoPublicaService from "../services/VotacaoPublicaService.js";
+ 
+async function registrarVoto(id_candidato, id_participante, id_evento) {
   try {
-    const message = getWelcomeMessage();
-    res.status(200).send(message);
+    // Inserir voto no banco de dados
+    const query = `insert into Votos (id_candidato, id_participante, id_evento) values ($1, $2, $3)`
+    const result = await pool.query(query, [id_candidato, id_participante, id_evento])
+    return result.rows[0] // Retornar o voto inserido
   } catch (error) {
-    res.status(500).send('Erro ao processar requisição');
+    console.error(error)
   }
-};
-
-export default getHome
+}
+ 
+ export default { registrarVoto};

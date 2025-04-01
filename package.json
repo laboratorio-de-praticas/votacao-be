@@ -8,6 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@prisma/client": "^6.5.0",
     "body-parser": "^1.20.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -28,5 +29,8 @@
   "bugs": {
     "url": "https://github.com/laboratorio-de-praticas/votacao-be/issues"
   },
-  "homepage": "https://github.com/laboratorio-de-praticas/votacao-be#readme"
+  "homepage": "https://github.com/laboratorio-de-praticas/votacao-be#readme",
+  "devDependencies": {
+    "prisma": "^6.5.0"
+  }
 }
