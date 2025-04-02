@@ -1,0 +1,174 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UsuarioTipos {
+  Admin
+  Atendente
+}
+
+enum EventoTipos {
+  Externo
+  Interno
+}
+
+enum EventoStatus {
+  Ativo
+  Em_Preparo
+  Em_Contagem
+  Finalizado
+}
+
+enum CandidatoSituacao {
+  Pendente
+  Ativo
+  Encerrado
+}
+
+enum UsuarioStatus {
+  Pendente
+  Ativo
+  Desligado
+}
+
+model Usuario {
+  id               Int           @id @default(autoincrement())
+  nome             String        @db.VarChar(250)
+  senha            String        @db.VarChar(400)
+  emailInstitucional String      @db.VarChar(250) @unique
+  tipoUsuario      UsuarioTipos
+  statusUsuario    UsuarioStatus
+  dataCriacao      DateTime      @default(now())
+  dataAlteracao    DateTime      @default(now())
+  alunos          Aluno[]
+}
+
+model Projeto {
+  id              Int       @id @default(autoincrement())
+  titulo          String    @db.VarChar(255)
+  descricao       String    @db.VarChar(200)
+  dataCriacao     DateTime  @default(now())
+  dataAlteracao   DateTime  @default(now())
+  fotos           FotosProjeto[]
+  categorias      CategoriasProjetos[]
+  candidatos      Candidato[]
+}
+
+model FotosProjeto {
+  id            Int      @id @default(autoincrement())
+  fotoUrl       String?  @db.VarChar(300)
+  fotoExtensao  String?  @db.VarChar(30)
+  fkProjeto     Int
+  dataCriacao   DateTime @default(now())
+  dataAlteracao DateTime @default(now())
+
+  projeto      Projeto @relation(fields: [fkProjeto], references: [id])
+}
+
+model Categoria {
+  id            Int       @id @default(autoincrement())
+  nome          String    @db.VarChar(120)
+  descricao     String?
+  dataCriacao   DateTime  @default(now())
+  dataAlteracao DateTime  @default(now())
+  projetos      CategoriasProjetos[]
+}
+
+model CategoriasProjetos {
+  id            Int       @id @default(autoincrement())
+  fkProjeto     Int
+  fkCategoria   Int
+  dataCriacao   DateTime  @default(now())
+  dataAlteracao DateTime  @default(now())
+
+  projeto       Projeto   @relation(fields: [fkProjeto], references: [id])
+  categoria     Categoria @relation(fields: [fkCategoria], references: [id])
+
+  @@unique([fkProjeto, fkCategoria])
+}
+
+model Aluno {
+  id           Int      @id @default(autoincrement())
+  fotoUrl      String?  @db.VarChar(300)
+  dataIngresso DateTime?
+  dataCriacao  DateTime @default(now())
+  dataAlteracao DateTime @default(now())
+  cursoSemestre String  @db.VarChar(50)
+  fkUsuario    Int
+
+  usuario      Usuario @relation(fields: [fkUsuario], references: [id])
+  candidatos   Candidato[]
+  participantes Participante[]
+}
+
+model Visitante {
+  id            Int      @id @default(autoincrement())
+  nomeSocial    String   @db.VarChar(200)
+  celular       String   @db.VarChar(12)
+  dataNascimento DateTime?
+  chaveAcesso   String   @db.VarChar(4)
+  
+  participantes Participante[]
+}
+
+model Evento {
+  id             Int           @id @default(autoincrement())
+  tipoEvento     EventoTipos
+  nomeEvento     String        @db.VarChar(255)
+  descricaoEvento String?
+  statusEvento   EventoStatus
+  cursoSemestre  String?       @db.VarChar(50)
+  dataInicio     DateTime?
+  dataFim        DateTime?
+  dataCriacao    DateTime       @default(now())
+  dataAlteracao  DateTime       @default(now())
+
+  candidatos    Candidato[]
+  participantes Participante[]
+  votos         Voto[]
+}
+
+model Candidato {
+  id               Int                @id @default(autoincrement())
+  idAluno          Int
+  idProjeto        Int
+  idEvento         Int
+  qrCode           String?            @db.VarChar(255)
+  situacaoCandidato CandidatoSituacao
+  dataCriacao      DateTime            @default(now())
+  dataAlteracao    DateTime            @default(now())
+
+  aluno           Aluno    @relation(fields: [idAluno], references: [id])
+  projeto         Projeto  @relation(fields: [idProjeto], references: [id])
+  evento          Evento   @relation(fields: [idEvento], references: [id])
+  votos           Voto[]
+}
+
+model Participante {
+  id            Int      @id @default(autoincrement())
+  idAluno       Int?
+  idVisitante   Int?
+  idEvento      Int
+  avaliador     Boolean
+
+  aluno        Aluno?      @relation(fields: [idAluno], references: [id])
+  visitante    Visitante?  @relation(fields: [idVisitante], references: [id])
+  evento       Evento      @relation(fields: [idEvento], references: [id])
+  votos        Voto[]
+}
+
+model Voto {
+  id            Int      @id @default(autoincrement())
+  idCandidato   Int
+  idParticipante Int
+  idEvento      Int
+
+  candidato    Candidato   @relation(fields: [idCandidato], references: [id])
+  participante Participante @relation(fields: [idParticipante], references: [id])
+  evento       Evento      @relation(fields: [idEvento], references: [id])
+}

@@ -22,6 +22,7 @@ O sistema deve ser seguro, acessível e funcional tanto para usuários internos 
 
 - **Back-end**: JavaScript | Node.js
 - **Banco de Dados**: PostgreSQL
+- **ORM**: Prisma ORM
 
 ## ⚙️ Como Rodar o Projeto
 
@@ -53,6 +54,22 @@ Antes de começar, certifique-se de ter instalado:
 
 O backend estará rodando em `http://localhost:3000`.
 
+## Configuração do Prisma
+
+### Instalação
+```sh
+npm install prisma @prisma/client
+```
+
+### Migração
+```sh
+npx prisma studio
+```
+
+### Prisma Studio (para visualizar dados)
+```sh
+npx run studio
+```
 ## 🔍 Entendendo o Sistema
 
 ### 🎓 Votação dos Representantes

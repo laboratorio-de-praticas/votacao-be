@@ -8,6 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@prisma/client": "^6.5.0",
     "body-parser": "^1.20.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -17,6 +18,7 @@
     "morgan": "^1.10.0",
     "nodemon": "^3.1.9",
     "pg": "^8.14.1",
+    "prisma": "^6.5.0",
     "supertest": "^7.0.0"
   },
   "repository": {
