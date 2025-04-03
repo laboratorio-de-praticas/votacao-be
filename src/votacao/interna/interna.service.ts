@@ -6,10 +6,11 @@ export class InternaService {
   constructor(private readonly prisma: PrismaService) {}
 
   async votar(id_aluno: number, id_candidato: number, id_evento: number) {
-    // Verificar se o evento está ativo dentro do período
+    // Verificar se o evento está ativo
     const evento = await this.prisma.evento.findUnique({
       where: { id_evento },
     });
+
     if (!evento || !evento.data_inicio || !evento.data_fim) {
       throw new BadRequestException('Evento inválido.');
     }
@@ -19,35 +20,33 @@ export class InternaService {
       throw new BadRequestException('A votação não está aberta neste momento.');
     }
 
-    // Verificar se o aluno existe
-    const aluno = await this.prisma.aluno.findUnique({
-      where: { id_aluno },
-      include: { usuario: true },
-    });
+    // Verificar se o aluno e o candidato existem
+    const [aluno, candidato] = await Promise.all([
+      this.prisma.aluno.findUnique({ where: { id_aluno } }),
+      this.prisma.aluno.findUnique({ where: { id_aluno: id_candidato } }),
+    ]);
+
     if (!aluno) {
       throw new BadRequestException('Aluno não encontrado.');
+    }
+
+    if (!candidato) {
+      throw new BadRequestException('Candidato inválido.');
     }
 
     // Verificar se o aluno já votou
     const votoExistente = await this.prisma.voto.findFirst({
       where: { id_participante: id_aluno, id_evento },
     });
+
     if (votoExistente) {
       throw new BadRequestException('Você já votou neste evento.');
     }
 
-    // Verificar se o candidato pertence à mesma sala (curso_semestre) do aluno
-    const candidato = await this.prisma.candidato.findUnique({
-      where: { id: id_candidato },
-      include: { aluno: true },
-    });
-    if (!candidato) {
-      throw new BadRequestException('Candidato inválido.');
-    }
-
-    if (aluno.curso_semestre !== candidato.aluno.curso_semestre) {
+    // Verificar se o candidato pertence à mesma sala do aluno
+    if (aluno.curso_semestre !== candidato.curso_semestre) {
       throw new BadRequestException(
-        'Você só pode votar em candidatos da sua sala.',
+        'Você só pode votar em candidatos do mesmo curso e semestre.',
       );
     }
 
@@ -68,6 +67,7 @@ export class InternaService {
     const aluno = await this.prisma.aluno.findUnique({
       where: { id_aluno },
     });
+
     if (!aluno) {
       throw new BadRequestException('Aluno não encontrado.');
     }
@@ -76,6 +76,7 @@ export class InternaService {
     const evento = await this.prisma.evento.findUnique({
       where: { id_evento },
     });
+
     if (!evento) {
       throw new BadRequestException('Evento não encontrado.');
     }
@@ -88,7 +89,8 @@ export class InternaService {
     return {
       id_aluno,
       id_evento,
-      voto_confirmado: !!voto, // Retorna true se já votou, false caso contrário
+      voto_confirmado: !!voto,
+      message: voto ? 'Aluno já votou neste evento.' : 'Aluno apto a votar.',
     };
   }
 }
