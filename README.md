@@ -38,7 +38,6 @@ Crie um arquivo `.env` na raiz do projeto e adicione as seguintes variáveis:
 
 ```env
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/votacao_db
-JWT_SECRET=sua_chave_secreta_aqui
 PORT=3000
 ```
 
@@ -108,3 +107,8 @@ docker-compose down
 
 📌 **Desenvolvido para proporcionar uma votação segura e transparente!**
 
+## 📌 Documentação da API
+
+A documentação completa da API, incluindo detalhes sobre os endpoints disponíveis, pode ser acessada no Swagger:
+
+🔗 [Swagger UI - Documentação da API](http://localhost:3000/api)
