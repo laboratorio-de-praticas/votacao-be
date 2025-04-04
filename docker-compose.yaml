@@ -1,4 +1,12 @@
 services:
+  server:
+    container_name: votacao_server
+    build: .
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: ${PORT}
+    ports:
+      - "${PORT}:${PORT}"
   postgres:
     image: postgres:15
     container_name: votacao_postgres
