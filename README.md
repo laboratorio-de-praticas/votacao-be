@@ -30,7 +30,16 @@ O sistema deve ser seguro, acessível e funcional tanto para usuários internos 
 Antes de começar, certifique-se de ter instalado:
 
 - [Node.js](https://nodejs.org/)
-- [PostgreSQL](https://www.postgresql.org/)
+- [PostgreSQL](https://www.postgresql.org/) ou Docker
+
+### 📌 Configuração do `.env`
+
+Crie um arquivo `.env` na raiz do projeto e adicione as seguintes variáveis:
+
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/votacao_db
+PORT=3000
+```
 
 ### 🚀 Instalação e Execução
 
@@ -44,7 +53,7 @@ Antes de começar, certifique-se de ter instalado:
    npm install
    ```
 
-3. Configure as variáveis de ambiente (crie um arquivo `.env` na pasta raiz e adicione as configurações necessárias, como conexão com o PostgreSQL e JWT secret).
+3. Configure as variáveis de ambiente conforme descrito acima.
 
 4. Execute as migrações do banco de dados:
    ```bash
@@ -64,6 +73,22 @@ Antes de começar, certifique-se de ter instalado:
 
 O backend estará rodando em `http://localhost:3000`.
 
+## 🐳 Rodando com Docker
+
+Caso prefira utilizar o Docker, siga os passos abaixo:
+
+1. Certifique-se de ter o **Docker** e **Docker Compose** instalados.
+2. No terminal, na raiz do projeto, execute o comando:
+   ```bash
+   docker-compose up -d
+   ```
+3. O PostgreSQL estará rodando no contêiner `votacao_postgres` na porta `5432`.
+
+Caso precise parar os contêineres:
+```bash
+docker-compose down
+```
+
 ## 🔍 Entendendo o Sistema
 
 ### 🎓 Votação dos Representantes
@@ -82,3 +107,8 @@ O backend estará rodando em `http://localhost:3000`.
 
 📌 **Desenvolvido para proporcionar uma votação segura e transparente!**
 
+## 📌 Documentação da API
+
+A documentação completa da API, incluindo detalhes sobre os endpoints disponíveis, pode ser acessada no Swagger:
+
+🔗 [Swagger UI - Documentação da API](http://localhost:3000/api)
