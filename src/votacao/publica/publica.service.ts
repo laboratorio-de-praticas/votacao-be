@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -9,45 +12,55 @@ export class PublicaService {
     id_visitante: number,
     id_candidato: number,
     id_evento: number,
-  ) {
+  ): Promise<{ message: string }> {
     const evento = await this.prisma.evento.findUnique({
       where: { id_evento },
+      select: { tipo_evento: true, status_evento: true },
     });
+
     if (!evento || evento.status_evento !== 'Ativo') {
       throw new BadRequestException('A votação não está aberta neste momento.');
     }
 
+    if (evento.tipo_evento === 'Interno') {
+      throw new BadRequestException(
+        'Convidados não podem votar em eventos internos.',
+      );
+    }
+
     const visitante = await this.prisma.visitante.findUnique({
       where: { id_visitante },
+      select: { id_visitante: true },
     });
+
     if (!visitante) {
       throw new BadRequestException('Visitante não encontrado.');
     }
 
-    // Verifica se o visitante já tem um registro de participante
     let participante = await this.prisma.participante.findFirst({
       where: { id_visitante, id_evento },
+      select: { id_participante: true },
     });
 
-    // Se o visitante ainda não é um participante, criamos um
     if (!participante) {
       participante = await this.prisma.participante.create({
-        data: {
-          id_visitante,
-          id_evento,
-        },
+        data: { id_visitante, id_evento },
+        select: { id_participante: true },
       });
     }
 
-    // Verificar se já votou nesse candidato
     const votoExistente = await this.prisma.voto.findFirst({
-      where: { id_participante: participante.id_participante, id_candidato },
+      where: {
+        id_participante: participante.id_participante,
+        id_candidato,
+      },
+      select: { id_voto: true },
     });
+
     if (votoExistente) {
-      throw new BadRequestException('Você já votou neste candidato.');
+      throw new BadRequestException('Você já votou neste projeto.');
     }
 
-    // Registrar o voto
     await this.prisma.voto.create({
       data: {
         id_participante: participante.id_participante,
@@ -59,15 +72,24 @@ export class PublicaService {
     return { message: 'Voto registrado com sucesso!' };
   }
 
-  async verificarConvidado(id_visitante: number, id_evento: number) {
+  async verificarConvidado(
+    id_visitante: number,
+    id_evento: number,
+  ): Promise<{ message: string }> {
     const participante = await this.prisma.participante.findFirst({
       where: { id_visitante, id_evento },
+      select: { id_participante: true },
     });
 
     if (participante) {
       const votoExistente = await this.prisma.voto.findFirst({
-        where: { id_participante: participante.id_participante, id_evento },
+        where: {
+          id_participante: participante.id_participante,
+          id_evento,
+        },
+        select: { id_voto: true },
       });
+
       if (votoExistente) {
         throw new BadRequestException('Você já votou neste evento.');
       }
@@ -80,21 +102,43 @@ export class PublicaService {
     id_avaliador: number,
     id_candidato: number,
     id_evento: number,
-  ) {
+  ): Promise<{ message: string }> {
     const evento = await this.prisma.evento.findUnique({
       where: { id_evento },
+      select: { tipo_evento: true, status_evento: true },
     });
+
     if (!evento || evento.status_evento !== 'Ativo') {
       throw new BadRequestException('A votação não está aberta neste momento.');
     }
 
+    if (evento.tipo_evento === 'Interno') {
+      throw new BadRequestException(
+        'Avaliadores não podem votar em eventos internos.',
+      );
+    }
+
     const avaliador = await this.prisma.participante.findUnique({
       where: { id_participante: id_avaliador },
+      select: { avaliador: true },
     });
-    if (!avaliador || !avaliador.avaliador) {
+
+    if (!avaliador?.avaliador) {
       throw new BadRequestException(
         'Avaliador não encontrado ou não autorizado.',
       );
+    }
+
+    const votoExistente = await this.prisma.voto.findFirst({
+      where: {
+        id_participante: id_avaliador,
+        id_candidato,
+      },
+      select: { id_voto: true },
+    });
+
+    if (votoExistente) {
+      throw new BadRequestException('Você já votou neste projeto.');
     }
 
     await this.prisma.voto.create({
@@ -108,9 +152,16 @@ export class PublicaService {
     return { message: 'Voto do avaliador registrado com sucesso!' };
   }
 
-  async verificarAvaliador(id_avaliador: number, id_evento: number) {
+  async verificarAvaliador(
+    id_avaliador: number,
+    id_evento: number,
+  ): Promise<{ message: string }> {
     const votoExistente = await this.prisma.voto.findFirst({
-      where: { id_participante: id_avaliador, id_evento },
+      where: {
+        id_participante: id_avaliador,
+        id_evento,
+      },
+      select: { id_voto: true },
     });
 
     if (votoExistente) {
@@ -125,9 +176,7 @@ export class PublicaService {
       where: { id_projeto },
       include: {
         candidatos: {
-          include: {
-            aluno: true,
-          },
+          include: { aluno: true },
         },
       },
     });
@@ -143,7 +192,7 @@ export class PublicaService {
     idAvaliador: number,
     idProjeto: number,
     estrelas: number,
-  ) {
+  ): Promise<{ message: string }> {
     if (estrelas < 1 || estrelas > 5) {
       throw new BadRequestException(
         'A classificação deve estar entre 1 e 5 estrelas.',
@@ -152,18 +201,43 @@ export class PublicaService {
 
     const avaliador = await this.prisma.participante.findUnique({
       where: { id_participante: idAvaliador },
+      select: { avaliador: true },
     });
 
-    if (!avaliador || !avaliador.avaliador) {
+    if (!avaliador?.avaliador) {
       throw new BadRequestException(
         'Avaliador não encontrado ou não autorizado.',
       );
     }
 
-    await this.prisma.projeto.update({
+    const projeto = await this.prisma.projeto.findUnique({
       where: { id_projeto: idProjeto },
+      select: { id_projeto: true },
+    });
+
+    if (!projeto) {
+      throw new BadRequestException('Projeto não encontrado.');
+    }
+
+    const classificacaoExistente = await this.prisma.classificacao.findUnique({
+      where: {
+        id_participante_id_projeto: {
+          id_participante: idAvaliador,
+          id_projeto: idProjeto,
+        },
+      },
+      select: { id_classificacao: true },
+    });
+
+    if (classificacaoExistente) {
+      throw new BadRequestException('Você já avaliou este projeto.');
+    }
+
+    await this.prisma.classificacao.create({
       data: {
-        descricao: `Avaliação de ${estrelas} estrelas`,
+        id_participante: idAvaliador,
+        id_projeto: idProjeto,
+        estrelas,
       },
     });
 
