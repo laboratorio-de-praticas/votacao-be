@@ -10,22 +10,30 @@ export class PublicaService {
 
   async votarConvidado(
     id_visitante: number,
-    id_candidato: number,
+    id_candidatos: number[],
     id_evento: number,
-  ): Promise<{ message: string }> {
+  ): Promise<{ message: string; votos: number[] }> {
     const evento = await this.prisma.evento.findUnique({
       where: { id_evento },
-      select: { tipo_evento: true, status_evento: true },
+      select: {
+        tipo_evento: true,
+        status_evento: true,
+        inicio_evento: true,
+        fim_evento: true,
+      },
     });
 
     if (!evento || evento.status_evento !== 'Ativo') {
       throw new BadRequestException('A votação não está aberta neste momento.');
     }
 
+    const now = new Date();
+    if (evento.inicio_evento > now || evento.fim_evento < now) {
+      throw new BadRequestException('O evento não está ativo neste momento.');
+    }
+
     if (evento.tipo_evento === 'Interno') {
-      throw new BadRequestException(
-        'Convidados não podem votar em eventos internos.',
-      );
+      throw new BadRequestException('Convidados não podem votar em eventos internos.');
     }
 
     const visitante = await this.prisma.visitante.findUnique({
@@ -49,27 +57,50 @@ export class PublicaService {
       });
     }
 
-    const votoExistente = await this.prisma.voto.findFirst({
-      where: {
-        id_participante: participante.id_participante,
-        id_candidato,
-      },
-      select: { id_voto: true },
-    });
+    const votosRegistrados: number[] = [];
 
-    if (votoExistente) {
-      throw new BadRequestException('Você já votou neste projeto.');
+    for (const id_candidato of id_candidatos) {
+      const votoExistente = await this.prisma.voto.findFirst({
+        where: {
+          id_participante: participante.id_participante,
+          id_candidato,
+          id_evento,
+        },
+      });
+
+      if (votoExistente) continue;
+
+      const participacao = await this.prisma.projeto.findFirst({
+        where: {
+          id_projeto: id_candidato,
+          participantes: {
+            some: { id_visitante },
+          },
+        },
+      });
+
+      if (participacao) continue;
+
+      const voto = await this.prisma.voto.create({
+        data: {
+          id_participante: participante.id_participante,
+          id_candidato,
+          id_evento,
+        },
+        select: { id_voto: true },
+      });
+
+      votosRegistrados.push(voto.id_voto);
     }
 
-    await this.prisma.voto.create({
-      data: {
-        id_participante: participante.id_participante,
-        id_candidato,
-        id_evento,
-      },
-    });
+    if (votosRegistrados.length === 0) {
+      throw new BadRequestException('Nenhum voto foi registrado. Você pode já ter votado ou participado de algum dos projetos selecionados.');
+    }
 
-    return { message: 'Voto registrado com sucesso!' };
+    return {
+      message: 'Votos registrados com sucesso!',
+      votos: votosRegistrados,
+    };
   }
 
   async verificarConvidado(
@@ -113,9 +144,7 @@ export class PublicaService {
     }
 
     if (evento.tipo_evento === 'Interno') {
-      throw new BadRequestException(
-        'Avaliadores não podem votar em eventos internos.',
-      );
+      throw new BadRequestException('Avaliadores não podem votar em eventos internos.');
     }
 
     const avaliador = await this.prisma.participante.findUnique({
@@ -124,9 +153,7 @@ export class PublicaService {
     });
 
     if (!avaliador?.avaliador) {
-      throw new BadRequestException(
-        'Avaliador não encontrado ou não autorizado.',
-      );
+      throw new BadRequestException('Avaliador não encontrado ou não autorizado.');
     }
 
     const votoExistente = await this.prisma.voto.findFirst({
@@ -194,9 +221,7 @@ export class PublicaService {
     estrelas: number,
   ): Promise<{ message: string }> {
     if (estrelas < 1 || estrelas > 5) {
-      throw new BadRequestException(
-        'A classificação deve estar entre 1 e 5 estrelas.',
-      );
+      throw new BadRequestException('A classificação deve estar entre 1 e 5 estrelas.');
     }
 
     const avaliador = await this.prisma.participante.findUnique({
@@ -205,9 +230,7 @@ export class PublicaService {
     });
 
     if (!avaliador?.avaliador) {
-      throw new BadRequestException(
-        'Avaliador não encontrado ou não autorizado.',
-      );
+      throw new BadRequestException('Avaliador não encontrado ou não autorizado.');
     }
 
     const projeto = await this.prisma.projeto.findUnique({

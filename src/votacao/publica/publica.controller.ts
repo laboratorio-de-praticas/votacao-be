@@ -19,7 +19,7 @@ export class PublicaController {
       type: 'object',
       properties: {
         id_visitante: { type: 'number', example: 1 },
-        id_candidato: { type: 'number', example: 10 },
+        id_candidatos: { type: 'array', items: { type: 'number' }, example: [1,2,3]},
         id_evento: { type: 'number', example: 100 },
       },
       required: ['id_visitante', 'id_candidato', 'id_evento'],
@@ -29,12 +29,12 @@ export class PublicaController {
   @ApiResponse({ status: 400, description: 'Erro na validação dos dados.' })
   async votarConvidado(
     @Body('id_visitante') id_visitante: number,
-    @Body('id_candidato') id_candidato: number,
+    @Body('id_candidatos') id_candidatos: number[],
     @Body('id_evento') id_evento: number,
   ) {
     return this.publicaService.votarConvidado(
       id_visitante,
-      id_candidato,
+      id_candidatos,
       id_evento,
     );
   }
