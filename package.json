@@ -1,7 +1,7 @@
 {
   "name": "votacao-be-nest",
   "version": "0.0.1",
-  "description": "",
+  "description": "<p align=\"center\">\r   <a href=\"https://fatecregistro.cps.sp.gov.br/\" target=\"blank\"><img src=\"https://bkpsitecpsnew.blob.core.windows.net/uploadsitecps/sites/40/2024/03/fatec_registro.png\" width=\"300\" alt=\"Fatec Logo\" /></a>\r </p>",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
@@ -27,17 +27,17 @@
     "seed": "ts-node ./prisma/seed.ts"
   },
   "dependencies": {
-    "@nestjs/common": "^11.0.1",
+    "@nestjs/common": "^11.0.14",
     "@nestjs/config": "^4.0.2",
-    "@nestjs/core": "^11.0.1",
-    "@nestjs/platform-express": "^11.0.1",
-    "@nestjs/swagger": "^11.1.0",
-    "@prisma/client": "^6.5.0",
+    "@nestjs/core": "^11.0.14",
+    "@nestjs/platform-express": "^11.0.14",
+    "@nestjs/swagger": "^11.1.1",
+    "@prisma/client": "^6.6.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
-    "prisma": "^6.5.0",
+    "prisma": "^6.6.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1",
+    "rxjs": "^7.8.2",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
@@ -83,5 +83,10 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  }
+  },
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": []
 }

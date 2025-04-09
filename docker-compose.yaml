@@ -7,6 +7,10 @@ services:
       PORT: ${PORT}
     ports:
       - "${PORT}:${PORT}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   postgres:
     image: postgres:15
     container_name: votacao_postgres
