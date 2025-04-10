@@ -18,29 +18,47 @@ export class PublicaController {
     schema: {
       type: 'object',
       properties: {
+<<<<<<< HEAD
         chave_acesso: { type: 'string', example: 'ABC123-XYZ456' },
         id_candidato: { type: 'number', example: 10 },
         id_evento: { type: 'number', example: 100 },
       },
       required: ['chave_acesso', 'id_candidato', 'id_evento'],
+=======
+        id_visitante: { type: 'number', example: 1 },
+        id_candidato: { type: 'number', example: 10 },
+        id_evento: { type: 'number', example: 100 },
+      },
+      required: ['id_visitante', 'id_candidato', 'id_evento'],
+>>>>>>> origin/develop
     },
   })
   @ApiResponse({ status: 201, description: 'Voto registrado com sucesso.' })
   @ApiResponse({ status: 400, description: 'Erro na validação dos dados.' })
+<<<<<<< HEAD
   @ApiResponse({ status: 404, description: 'Chave de acesso não encontrada!'})
   async votarConvidado(
     @Body('chave_acesso') chave_acesso: string,
+=======
+  async votarConvidado(
+    @Body('id_visitante') id_visitante: number,
+>>>>>>> origin/develop
     @Body('id_candidato') id_candidato: number,
     @Body('id_evento') id_evento: number,
   ) {
     return this.publicaService.votarConvidado(
+<<<<<<< HEAD
       chave_acesso,
+=======
+      id_visitante,
+>>>>>>> origin/develop
       id_candidato,
       id_evento,
     );
   }
 
   /**
+<<<<<<< HEAD
    * Verifica se o convidado pode votar no evento com a condição de possuir chave de acesso.
    */
   @Get('convidado/verificacao')
@@ -65,6 +83,21 @@ export class PublicaController {
     @Query('id_evento') id_evento: number,
   ) {
     return this.publicaService.verificarConvidado(chave_acesso, id_evento);
+=======
+   * Verifica se o convidado pode votar no evento.
+   */
+  @Get('convidado/verificacao')
+  @ApiOperation({ summary: 'Verificar se o convidado pode votar' })
+  @ApiQuery({ name: 'id_visitante', required: true, example: 1 })
+  @ApiQuery({ name: 'id_evento', required: true, example: 100 })
+  @ApiResponse({ status: 200, description: 'Status da elegibilidade do convidado.' })
+  @ApiResponse({ status: 400, description: 'Parâmetros inválidos ou ausentes.' })
+  async verificarConvidado(
+    @Query('id_visitante') id_visitante: number,
+    @Query('id_evento') id_evento: number,
+  ) {
+    return this.publicaService.verificarConvidado(id_visitante, id_evento);
+>>>>>>> origin/develop
   }
 
   /**
