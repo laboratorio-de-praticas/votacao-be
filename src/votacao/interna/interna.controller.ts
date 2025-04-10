@@ -1,8 +1,8 @@
-import {  Controller,  Post,  Get,  Body,  Query,  BadRequestException,} from '@nestjs/common';
-import {  ApiTags,  ApiOperation,  ApiBody,  ApiQuery,  ApiResponse,} from '@nestjs/swagger';
-import { InternaService } from './interna.service';
-import { CriarVotoDto } from './dto/criar-voto.dto';
-import { VerificarVotoDto } from './dto/verificar-voto.dto';
+import {  Controller,  Post,  Get,  Body,  Query,  BadRequestException,} from '@nestjs/common'
+import {  ApiTags,  ApiOperation,  ApiBody,  ApiQuery,  ApiResponse,} from '@nestjs/swagger'
+import { InternaService } from './interna.service'
+import { CriarVotoDto } from './dto/criar-voto.dto'
+import { VerificarVotoDto } from './dto/verificar-voto.dto'
 
 @ApiTags('Votacao Interna')
 @Controller('votacao/interna')
@@ -18,10 +18,10 @@ export class InternaController {
     const { idAluno, idRepresentante, idEvento } = body
 
     if (!idAluno || !idRepresentante || !idEvento) {
-      throw new BadRequestException('Todos os campos são obrigatórios.');
+      throw new BadRequestException('Todos os campos são obrigatórios.')
     }
 
-    return this.internaService.votar(idAluno, idRepresentante, idEvento);
+    return this.internaService.votar(idAluno, idRepresentante, idEvento)
   }
 
   @Get('confirmacao/verificacao')
@@ -31,12 +31,12 @@ export class InternaController {
   @ApiResponse({ status: 200, description: 'Status do voto retornado com sucesso.' })
   @ApiResponse({ status: 400, description: 'Parâmetros obrigatórios ausentes ou inválidos.' })
   async verificarVoto(@Query() query: VerificarVotoDto) {
-    const { idAluno, idEvento } = query;
+    const { idAluno, idEvento } = query
 
     if (!idAluno || !idEvento) {
-      throw new BadRequestException('Os parâmetros idAluno e idEvento são obrigatórios.');
+      throw new BadRequestException('Os parâmetros idAluno e idEvento são obrigatórios.')
     }
 
-    return this.internaService.verificarVoto(idAluno, idEvento);
+    return this.internaService.verificarVoto(idAluno, idEvento)
   }
 }

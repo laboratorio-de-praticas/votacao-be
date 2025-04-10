@@ -49,11 +49,8 @@ model Usuario {
 
   aluno               Aluno?
   avaliador           Avaliador?
-<<<<<<< HEAD
-=======
 
   @@map("Usuarios")
->>>>>>> c12f34f (fix: Correção no Schema e no código em relação as regras de negócio)
 }
 
 model Aluno {
@@ -69,11 +66,8 @@ model Aluno {
   representante  Representante?
   projetos       Projeto[]
   votosInternos  VotoInterno[]
-<<<<<<< HEAD
-=======
 
   @@map("Alunos")
->>>>>>> c12f34f (fix: Correção no Schema e no código em relação as regras de negócio)
 }
 
 model Visitante {
@@ -85,13 +79,9 @@ model Visitante {
   data_alteracao  DateTime       @default(now())
 
   votosExternos   VotoExterno[]
-<<<<<<< HEAD
-=======
 
   @@map("Visitantes")
->>>>>>> c12f34f (fix: Correção no Schema e no código em relação as regras de negócio)
 }
-
 
 model Avaliador {
   id_avaliador    Int            @id @default(autoincrement())
@@ -104,11 +94,8 @@ model Avaliador {
 
   votosExternos   VotoExterno[]
   avaliacoes      Avaliacao[]
-<<<<<<< HEAD
-=======
 
   @@map("Avaliadores")
->>>>>>> c12f34f (fix: Correção no Schema e no código em relação as regras de negócio)
 }
 
 model Projeto {
@@ -125,11 +112,8 @@ model Projeto {
   votosExternos   VotoExterno[]
   avaliacoes      Avaliacao[]
   categorias      CategoriasProjetos[]
-<<<<<<< HEAD
-=======
 
   @@map("Projetos")
->>>>>>> c12f34f (fix: Correção no Schema e no código em relação as regras de negócio)
 }
 
 model Categoria {
@@ -140,11 +124,8 @@ model Categoria {
   data_alteracao  DateTime       @default(now())
 
   projetos        CategoriasProjetos[]
-<<<<<<< HEAD
-=======
 
   @@map("Categorias")
->>>>>>> c12f34f (fix: Correção no Schema e no código em relação as regras de negócio)
 }
 
 model CategoriasProjetos {
@@ -158,10 +139,7 @@ model CategoriasProjetos {
   categoria       Categoria      @relation(fields: [fk_id_categoria], references: [id_categoria])
 
   @@unique([fk_id_projeto, fk_id_categoria])
-<<<<<<< HEAD
-=======
   @@map("CategoriasProjetos")
->>>>>>> c12f34f (fix: Correção no Schema e no código em relação as regras de negócio)
 }
 
 model Evento {
@@ -179,11 +157,8 @@ model Evento {
   representantes   Representante[]
   votosInternos    VotoInterno[]
   votosExternos    VotoExterno[]
-<<<<<<< HEAD
-=======
 
   @@map("Eventos")
->>>>>>> c12f34f (fix: Correção no Schema e no código em relação as regras de negócio)
 }
 
 model Representante {
@@ -191,22 +166,15 @@ model Representante {
   fk_id_aluno          Int                     @unique
   fk_id_evento         Int
   qrcode               String?
-<<<<<<< HEAD
-  RepresentanteSituacao RepresentanteSituacao
-=======
   representantesituacao RepresentanteSituacao
->>>>>>> c12f34f (fix: Correção no Schema e no código em relação as regras de negócio)
   data_criacao         DateTime                @default(now())
   data_alteracao       DateTime                @default(now())
 
   aluno                Aluno                   @relation(fields: [fk_id_aluno], references: [id_aluno])
   evento               Evento                  @relation(fields: [fk_id_evento], references: [id_evento])
   votosRecebidos       VotoInterno[]           @relation("RepresentanteVotos")
-<<<<<<< HEAD
-=======
 
   @@map("Representantes")
->>>>>>> c12f34f (fix: Correção no Schema e no código em relação as regras de negócio)
 }
 
 model VotoInterno {
@@ -221,10 +189,7 @@ model VotoInterno {
   representante   Representante @relation("RepresentanteVotos", fields: [fk_id_representante], references: [id_representante])
 
   @@unique([fk_id_evento, fk_id_aluno])
-<<<<<<< HEAD
-=======
   @@map("VotosInternos")
->>>>>>> c12f34f (fix: Correção no Schema e no código em relação as regras de negócio)
 }
 
 model VotoExterno {
@@ -242,15 +207,9 @@ model VotoExterno {
 
   @@unique([fk_id_evento, fk_id_visitante, fk_id_projeto])
   @@unique([fk_id_evento, fk_id_avaliador, fk_id_projeto])
-<<<<<<< HEAD
-}
-
-
-=======
   @@map("VotosExternos")
 }
 
->>>>>>> c12f34f (fix: Correção no Schema e no código em relação as regras de negócio)
 model Avaliacao {
   id_avaliacao       Int         @id @default(autoincrement())
   fk_id_avaliador    Int
@@ -263,10 +222,6 @@ model Avaliacao {
 
   avaliador          Avaliador   @relation(fields: [fk_id_avaliador], references: [id_avaliador])
   projeto            Projeto     @relation(fields: [fk_id_projeto], references: [id_projeto])
-<<<<<<< HEAD
-}
-=======
 
   @@map("Avaliacoes")
 }
->>>>>>> c12f34f (fix: Correção no Schema e no código em relação as regras de negócio)

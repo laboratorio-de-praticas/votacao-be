@@ -3,7 +3,7 @@ import { InternaModule } from './interna/interna.module';
 //import { PublicaModule } from './publica/publica.module';
 
 @Module({
-  imports: [InternaModule /*, PublicaModule */],
+  imports: [InternaModule /*, PublicaModule */ ],
 
 })
 export class VotacaoModule {}

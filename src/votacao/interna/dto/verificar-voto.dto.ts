@@ -10,7 +10,7 @@ export class VerificarVotoDto {
   @Type(() => Number)
   @IsInt()
   @IsNotEmpty()
-  idAluno: number;
+  idAluno: number
 
   @ApiProperty({
     description: 'ID do evento no qual verificar se ele pode votar',

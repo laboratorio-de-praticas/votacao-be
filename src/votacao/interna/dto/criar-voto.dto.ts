@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger'
+import { IsInt, IsNotEmpty } from 'class-validator'
 
 export class CriarVotoDto {
   @ApiProperty({ description: 'ID do aluno que está votando', example: 1 })
