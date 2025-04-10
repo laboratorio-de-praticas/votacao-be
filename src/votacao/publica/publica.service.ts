@@ -169,11 +169,11 @@ export class PublicaService {
       throw new BadRequestException('Você já votou neste projeto.');
     }
 
-    await this.prisma.voto.create({
+    await this.prisma.votoExterno.create({
       data: {
-        id_participante: id_avaliador,
-        id_candidato,
-        id_evento,
+        fk_id_evento: id_evento,
+        fk_id_projeto: id_projeto,
+        fk_id_visitante: id_visitante,
       },
     });
 
