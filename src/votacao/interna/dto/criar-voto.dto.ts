@@ -5,7 +5,7 @@ export class CriarVotoDto {
   @ApiProperty({ description: 'ID do aluno que está votando', example: 1 })
   @IsInt()
   @IsNotEmpty()
-  idAluno: number;
+  idAluno: number
 
   @ApiProperty({
     description: 'ID do representante que está recebendo o voto',

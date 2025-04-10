@@ -92,6 +92,7 @@ model Visitante {
 >>>>>>> c12f34f (fix: Correção no Schema e no código em relação as regras de negócio)
 }
 
+
 model Avaliador {
   id_avaliador    Int            @id @default(autoincrement())
   fk_id_usuario   Int            @unique

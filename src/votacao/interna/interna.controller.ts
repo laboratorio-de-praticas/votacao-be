@@ -15,7 +15,7 @@ export class InternaController {
   @ApiResponse({ status: 201, description: 'Voto registrado com sucesso.' })
   @ApiResponse({ status: 400, description: 'Erro de validação nos dados enviados.' })
   async votar(@Body() body: CriarVotoDto): Promise<{ message: string }> {
-    const { idAluno, idRepresentante, idEvento } = body;
+    const { idAluno, idRepresentante, idEvento } = body
 
     if (!idAluno || !idRepresentante || !idEvento) {
       throw new BadRequestException('Todos os campos são obrigatórios.');
