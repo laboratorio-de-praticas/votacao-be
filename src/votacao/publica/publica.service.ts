@@ -72,24 +72,21 @@ export class PublicaService {
   async verificarConvidado(
     id_visitante: number,
     id_evento: number,
+    id_candidato: number
   ): Promise<{ message: string }> {
-    const participante = await this.prisma.participante.findFirst({
-      where: { id_visitante, id_evento },
-      select: { id_participante: true },
+    const evento = await this.prisma.evento.findUnique({
+      where: { id_evento },
+      select: { tipo_evento: true, status_evento: true },
     });
 
-    if (participante) {
-      const votoExistente = await this.prisma.voto.findFirst({
-        where: {
-          id_participante: participante.id_participante,
-          id_evento,
-        },
-        select: { id_voto: true },
-      });
+    if (!evento || evento.status_evento !== 'Ativo') {
+      throw new BadRequestException('A votação não está aberta neste momento.');
+    }
 
-      if (votoExistente) {
-        throw new BadRequestException('Você já votou neste evento.');
-      }
+    if (evento.tipo_evento === 'Interno') {
+      throw new BadRequestException(
+        'Convidados não podem votar em eventos internos.',
+      );
     }
 
     return { message: 'Convidado apto a votar.' };
