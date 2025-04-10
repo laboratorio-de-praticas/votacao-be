@@ -186,11 +186,45 @@ export class PublicaService {
   async verificarAvaliador(
     id_avaliador: number,
     id_evento: number,
+    id_candidato: number
   ): Promise<{ message: string }> {
-    const votoExistente = await this.prisma.voto.findFirst({
+    const evento = await this.prisma.evento.findUnique({
+      where: { id_evento },
+      select: { tipo_evento: true, status_evento: true },
+    });
+
+    if (!evento || evento.status_evento !== 'Ativo') {
+      throw new BadRequestException('A votação não está aberta neste momento.');
+    }
+
+    if (evento.tipo_evento === 'Interno') {
+      throw new BadRequestException(
+        'Avaliador não podem votar em eventos internos.',
+      );
+    }
+
+    const avaliador = await this.prisma.avaliador.findUnique({
+      where: { id_avaliador },
+      select: { id_avaliador: true },
+    });
+
+    if (!avaliador) {
+      throw new BadRequestException('Avaliador não encontrado.');
+    }
+
+    const projeto = await this.prisma.projeto.findFirst({
+	where: { id_projeto: id_candidato },
+	select: { id_projeto: true }
+    });
+
+    if(!projeto) {
+	throw new BadRequestException('Projeto não encontrado');
+    }
+
+    const votoExistente = await this.prisma.votoExterno.findFirst({
       where: {
-        id_participante: id_avaliador,
-        id_evento,
+	      fk_id_projeto: projeto.id_projeto,
+	      fk_id_avaliador: avaliador.id_avaliador
       },
       select: { id_voto: true },
     });
@@ -203,13 +237,11 @@ export class PublicaService {
   }
 
   async detalhesProjeto(id_projeto: number) {
-    const projeto = await this.prisma.projeto.findUnique({
+    const projeto = await this.prisma.projeto.findFirst({
       where: { id_projeto },
-      include: {
-        candidatos: {
-          include: { aluno: true },
-        },
-      },
+      	include: {
+	      aluno: true
+      	}
     });
 
     if (!projeto) {
