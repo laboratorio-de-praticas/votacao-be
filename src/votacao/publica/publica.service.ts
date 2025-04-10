@@ -254,20 +254,26 @@ export class PublicaService {
   async classificarProjeto(
     idAvaliador: number,
     idProjeto: number,
-    estrelas: number,
+    estrelas_inovador: number,
+    estrelas_acolhedor: number
   ): Promise<{ message: string }> {
-    if (estrelas < 1 || estrelas > 5) {
+    if (estrelas_inovador < 1 || estrelas_inovador > 5) {
+      throw new BadRequestException(
+        'A classificação deve estar entre 1 e 5 estrelas.',
+      );
+    }
+    if (estrelas_acolhedor < 1 || estrelas_acolhedor > 5) {
       throw new BadRequestException(
         'A classificação deve estar entre 1 e 5 estrelas.',
       );
     }
 
-    const avaliador = await this.prisma.participante.findUnique({
-      where: { id_participante: idAvaliador },
-      select: { avaliador: true },
+    const avaliador = await this.prisma.avaliador.findUnique({
+      where: { id_avaliador: idAvaliador },
+      select: { id_avaliador: true },
     });
 
-    if (!avaliador?.avaliador) {
+    if (!avaliador?.id_avaliador) {
       throw new BadRequestException(
         'Avaliador não encontrado ou não autorizado.',
       );
@@ -282,25 +288,24 @@ export class PublicaService {
       throw new BadRequestException('Projeto não encontrado.');
     }
 
-    const classificacaoExistente = await this.prisma.classificacao.findUnique({
+    const classificacaoExistente = await this.prisma.avaliacao.findFirst({
       where: {
-        id_participante_id_projeto: {
-          id_participante: idAvaliador,
-          id_projeto: idProjeto,
-        },
+          fk_id_avaliador: idAvaliador,
+          fk_id_projeto: idProjeto,
       },
-      select: { id_classificacao: true },
+      select: { id_avaliacao: true },
     });
 
     if (classificacaoExistente) {
       throw new BadRequestException('Você já avaliou este projeto.');
     }
 
-    await this.prisma.classificacao.create({
+    await this.prisma.avaliacao.create({
       data: {
-        id_participante: idAvaliador,
-        id_projeto: idProjeto,
-        estrelas,
+        fk_id_avaliador: idAvaliador,
+        fk_id_projeto: idProjeto,
+        estrelas_inovador,
+	estrelas_acolhedor
       },
     });
 
