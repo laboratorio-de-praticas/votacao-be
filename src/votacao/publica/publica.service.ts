@@ -89,6 +89,35 @@ export class PublicaService {
       );
     }
 
+    const visitante = await this.prisma.visitante.findUnique({
+      where: { id_visitante },
+      select: { id_visitante: true },
+    });
+
+    if (!visitante) {
+      throw new BadRequestException('Visitante não encontrado.');
+    }
+
+    const projeto = await this.prisma.projeto.findFirst({
+	where: { id_projeto: id_candidato },
+	select: { id_projeto: true }
+    });
+
+    if(!projeto) {
+	throw new BadRequestException('Projeto não encontrado');
+    }
+
+    const votoExistente = await this.prisma.votoExterno.findFirst({
+      where: {
+	      fk_id_projeto: projeto.id_projeto,
+	      fk_id_visitante: visitante.id_visitante
+      },
+      select: { id_voto: true },
+    });
+
+    if (votoExistente) {
+      throw new BadRequestException('Você já votou neste evento.');
+    }
     return { message: 'Convidado apto a votar.' };
   }
 
