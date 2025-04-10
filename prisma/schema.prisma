@@ -169,6 +169,19 @@ model Voto {
   @@unique([id_participante, id_candidato]) // com essa alteração um mesmo participante só poderá votar uma vez em um mesmo candidato ou projeto
 }
 
+model VotoExterno {
+  id_votoExterno         Int          @id @default(autoincrement())
+  candidato       Candidato    @relation(fields: [id_candidato], references: [id])
+  id_candidato    Int
+  participante    Participante @relation(fields: [id_participante], references: [id_participante])
+  id_participante Int
+  evento          Evento       @relation(fields: [id_evento], references: [id_evento])
+  id_evento       Int
+
+  @@unique([id_participante, id_candidato])
+}
+
+
 model Classificacao {
   id_classificacao     Int           @id @default(autoincrement())
   participante         Participante  @relation(fields: [id_participante], references: [id_participante])

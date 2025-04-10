@@ -61,7 +61,7 @@ export class PublicaService {
     const votosRegistrados: number[] = [];
 
     for (const id_candidato of id_candidatos) {
-      const votoExistente = await this.prisma.voto.findFirst({
+      const votoExistente = await this.prisma.votoExterno.findFirst({
         where: {
           id_participante: participante.id_participante,
           id_candidato,
@@ -82,7 +82,7 @@ export class PublicaService {
 
       if (participacao) continue;
 
-      const voto = await this.prisma.voto.create({
+      const votoExterno = await this.prisma.votoExterno.create({
         data: {
           id_participante: participante.id_participante,
           id_candidato,
@@ -91,7 +91,7 @@ export class PublicaService {
         select: { id_voto: true },
       });
 
-      votosRegistrados.push(voto.id_voto);
+      votosRegistrados.push(votoExterno.id_voto);
     }
 
     if (votosRegistrados.length === 0) {
@@ -114,7 +114,7 @@ export class PublicaService {
     });
 
     if (participante) {
-      const votoExistente = await this.prisma.voto.findFirst({
+      const votoExistente = await this.prisma.votoExterno.findFirst({
         where: {
           id_participante: participante.id_participante,
           id_evento,
