@@ -118,6 +118,7 @@ export class PublicaService {
     if (votoExistente) {
       throw new BadRequestException('Você já votou neste evento.');
     }
+
     return { message: 'Convidado apto a votar.' };
   }
 
@@ -137,38 +138,45 @@ export class PublicaService {
 
     if (evento.tipo_evento === 'Interno') {
       throw new BadRequestException(
-        'Avaliadores não podem votar em eventos internos.',
+        'Avalidor não podem votar em eventos internos.',
       );
     }
 
-    const avaliador = await this.prisma.participante.findUnique({
-      where: { id_participante: id_avaliador },
-      select: { avaliador: true },
+    const avaliador = await this.prisma.avaliador.findUnique({
+      where: { id_avaliador },
+      select: { id_avaliador: true },
     });
 
-    if (!avaliador?.avaliador) {
-      throw new BadRequestException(
-        'Avaliador não encontrado ou não autorizado.',
-      );
+    if (!avaliador) {
+      throw new BadRequestException('Avaliador não encontrado.');
     }
 
-    const votoExistente = await this.prisma.voto.findFirst({
+    const projeto = await this.prisma.projeto.findFirst({
+	where: { id_projeto: id_candidato },
+	select: { id_projeto: true }
+    });
+
+    if(!projeto) {
+	throw new BadRequestException('Projeto não encontrado');
+    }
+
+    const votoExistente = await this.prisma.votoExterno.findFirst({
       where: {
-        id_participante: id_avaliador,
-        id_candidato,
+	      fk_id_projeto: projeto.id_projeto,
+	      fk_id_visitante: avaliador.id_avaliador
       },
       select: { id_voto: true },
     });
 
     if (votoExistente) {
-      throw new BadRequestException('Você já votou neste projeto.');
+      throw new BadRequestException('Você já votou neste evento.');
     }
 
-    await this.prisma.voto.create({
+    await this.prisma.votoExterno.create({
       data: {
-        id_participante: id_avaliador,
-        id_candidato,
-        id_evento,
+        fk_id_projeto: projeto.id_projeto,
+        fk_id_visitante: avaliador.id_avaliador,
+        fk_id_evento: id_evento,
       },
     });
 
