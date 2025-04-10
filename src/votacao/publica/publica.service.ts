@@ -71,13 +71,11 @@ export class PublicaService {
 
       if (votoExistente) continue;
 
-      const participacao = await this.prisma.candidato.findFirst({
+      const participacao = await this.prisma.projeto.findFirst({
         where: {
           id_projeto: id_candidato,
-          aluno: {
-            participante: {
+            participantes: {
               some: { id_visitante },
-            },
           },
         },
       });
