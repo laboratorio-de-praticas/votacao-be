@@ -46,13 +46,15 @@ export class PublicaController {
   @ApiOperation({ summary: 'Verificar se o convidado pode votar' })
   @ApiQuery({ name: 'id_visitante', required: true, example: 1 })
   @ApiQuery({ name: 'id_evento', required: true, example: 100 })
+  @ApiQuery({ name: 'id_candidato', required: true, example: 100 })
   @ApiResponse({ status: 200, description: 'Status da elegibilidade do convidado.' })
   @ApiResponse({ status: 400, description: 'Parâmetros inválidos ou ausentes.' })
   async verificarConvidado(
     @Query('id_visitante') id_visitante: number,
     @Query('id_evento') id_evento: number,
+    @Query('id_candidato') id_candidato: number
   ) {
-    return this.publicaService.verificarConvidado(id_visitante, id_evento);
+    return this.publicaService.verificarConvidado(id_visitante, id_evento, id_candidato);
   }
 
   /**
