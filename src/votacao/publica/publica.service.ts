@@ -46,16 +46,16 @@ export class PublicaService {
       throw new BadRequestException('Projeto não encontrado');
     }
 
-    const votoExistente = await this.prisma.voto.findFirst({
+    const votoExistente = await this.prisma.votoExterno.findFirst({
       where: {
-        id_participante: participante.id_participante,
-        id_candidato,
+	      fk_id_projeto: projeto.id_projeto,
+	      fk_id_visitante: visitante.id_visitante
       },
       select: { id_voto: true },
     });
 
     if (votoExistente) {
-      throw new BadRequestException('Você já votou neste projeto.');
+      throw new BadRequestException('Você já votou neste evento.');
     }
 
     await this.prisma.voto.create({
