@@ -5,6 +5,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class InternaService {
   constructor(private readonly prisma: PrismaService) {}
 
+<<<<<<< HEAD
   async votar(id_aluno: number, id_representante: number, id_evento: number) {
     const evento = await this.prisma.evento.findUnique({ where: { id_evento } });
 
@@ -27,16 +28,54 @@ export class InternaService {
     const aluno = await this.prisma.aluno.findUnique({
       where: { id_aluno },
       include: { usuario: true },
+=======
+  async votar(idAluno: number, idRepresentante: number, idEvento: number): Promise<{ message: string }> {
+    const evento = await this.prisma.evento.findUnique({
+      where: { id_evento: idEvento },
+    });
+
+    if (!evento || evento.tipo_evento !== 'Interno') {
+      throw new BadRequestException('Evento inválido ou não é do tipo interno.');
+    }
+
+    const aluno = await this.prisma.aluno.findUnique({
+      where: { id_aluno: idAluno },
+>>>>>>> c12f34f (fix: Correção no Schema e no código em relação as regras de negócio)
     });
 
     if (!aluno || !aluno.usuario) {
       throw new BadRequestException('Aluno não cadastrado.');
     }
 
+<<<<<<< HEAD
     const votoExistente = await this.prisma.votoInterno.findFirst({
       where: {
         fk_id_evento: id_evento,
         fk_id_aluno: id_aluno,
+=======
+    const representante = await this.prisma.representante.findUnique({
+      where: { id_representante: idRepresentante },
+      include: {
+        aluno: true,
+      },
+    });
+
+    if (!representante) {
+      throw new BadRequestException('Representante não encontrado.');
+    }
+
+    if (
+      aluno.curso_semestre !== representante.aluno.curso_semestre &&
+      aluno.id_aluno !== representante.aluno.id_aluno
+    ) {
+      throw new BadRequestException('Você só pode votar em representantes da sua turma.');
+    }
+
+    const votoExistente = await this.prisma.votoInterno.findFirst({
+      where: {
+        fk_id_aluno: idAluno,
+        fk_id_evento: idEvento,
+>>>>>>> c12f34f (fix: Correção no Schema e no código em relação as regras de negócio)
       },
     });
 
@@ -44,6 +83,7 @@ export class InternaService {
       throw new BadRequestException('Você já votou neste evento.');
     }
 
+<<<<<<< HEAD
     const representante = await this.prisma.representante.findUnique({
       where: { id_representante },
       include: { aluno: true, evento: true },
@@ -62,9 +102,35 @@ export class InternaService {
         fk_id_evento: id_evento,
         fk_id_aluno: id_aluno,
         fk_id_representante: id_representante,
+=======
+    await this.prisma.votoInterno.create({
+      data: {
+        fk_id_evento: idEvento,
+        fk_id_representante: idRepresentante,
+        fk_id_aluno: idAluno,
+>>>>>>> c12f34f (fix: Correção no Schema e no código em relação as regras de negócio)
       },
     });
 
     return { message: 'Voto registrado com sucesso!' };
   }
+<<<<<<< HEAD
+=======
+
+  async verificarVoto(idAluno: number, idEvento: number) {
+    const voto = await this.prisma.votoInterno.findFirst({
+      where: {
+        fk_id_aluno: idAluno,
+        fk_id_evento: idEvento,
+      },
+    });
+
+    return {
+      idAluno,
+      idEvento,
+      votoConfirmado: !!voto,
+      message: voto ? 'Aluno já votou neste evento.' : 'Aluno apto a votar.',
+    };
+  }
+>>>>>>> c12f34f (fix: Correção no Schema e no código em relação as regras de negócio)
 }
