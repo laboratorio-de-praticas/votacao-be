@@ -81,7 +81,8 @@ export class PublicaController {
       properties: {
         id_avaliador: { type: 'number', example: 2 },
         id_projeto: { type: 'number', example: 200 },
-        estrelas: { type: 'number', minimum: 1, maximum: 5, example: 4 },
+        estrelas_inovador: { type: 'number', minimum: 1, maximum: 5, example: 4 },
+        estrelas_acolhedor: { type: 'number', minimum: 1, maximum: 5, example: 4 },
       },
       required: ['id_avaliador', 'id_projeto', 'estrelas'],
     },
@@ -91,12 +92,14 @@ export class PublicaController {
   async classificarProjeto(
     @Body('id_avaliador') id_avaliador: number,
     @Body('id_projeto') id_projeto: number,
-    @Body('estrelas') estrelas: number,
+    @Body('estrelas_inovador') estrelas_inovador: number,
+    @Body('estrelas_acolhedor') estrelas_acolhedor: number,
   ) {
     return this.publicaService.classificarProjeto(
       id_avaliador,
       id_projeto,
-      estrelas,
+      estrelas_inovador,
+      estrelas_acolhedor,
     );
   }
 
