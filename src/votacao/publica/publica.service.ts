@@ -37,16 +37,13 @@ export class PublicaService {
       throw new BadRequestException('Visitante não encontrado.');
     }
 
-    let participante = await this.prisma.participante.findFirst({
-      where: { id_visitante, id_evento },
-      select: { id_participante: true },
+    const projeto = await this.prisma.projeto.findFirst({
+      where: { id_projeto: id_candidato },
+      select: { id_projeto: true }
     });
 
-    if (!participante) {
-      participante = await this.prisma.participante.create({
-        data: { id_visitante, id_evento },
-        select: { id_participante: true },
-      });
+    if(!projeto) {
+      throw new BadRequestException('Projeto não encontrado');
     }
 
     const votoExistente = await this.prisma.voto.findFirst({
