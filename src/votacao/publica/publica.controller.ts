@@ -22,7 +22,7 @@ export class PublicaController {
         id_candidatos: { type: 'array', items: { type: 'number' }, example: [1,2,3]},
         id_evento: { type: 'number', example: 100 },
       },
-      required: ['id_visitante', 'id_candidato', 'id_evento'],
+      required: ['id_visitante', 'id_candidatos', 'id_evento'],
     },
   })
   @ApiResponse({ status: 201, description: 'Voto registrado com sucesso.' })

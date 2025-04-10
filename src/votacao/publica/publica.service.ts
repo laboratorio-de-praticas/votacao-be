@@ -18,22 +18,23 @@ export class PublicaService {
       select: {
         tipo_evento: true,
         status_evento: true,
-        inicio_evento: true,
-        fim_evento: true,
+        data_inicio: true,
+        data_fim: true,
       },
     });
 
-    if (!evento || evento.status_evento !== 'Ativo') {
-      throw new BadRequestException('A votação não está aberta neste momento.');
+    if (!evento || evento.status_evento !== 'Ativo' || evento.tipo_evento !== 'Externo') {
+      throw new BadRequestException('O evento não está disponível neste momento.');
     }
 
     const now = new Date();
-    if (evento.inicio_evento > now || evento.fim_evento < now) {
-      throw new BadRequestException('O evento não está ativo neste momento.');
+    if (evento.data_inicio <= now || evento.data_fim >= now) {
+      throw new BadRequestException('O evento está ativo neste momento.');
     }
 
-    if (evento.tipo_evento === 'Interno') {
-      throw new BadRequestException('Convidados não podem votar em eventos internos.');
+    const agora = new Date();
+    if (agora < evento.data_inicio || agora > evento.data_fim) {
+    throw new BadRequestException('O evento não está ativo neste momento.');
     }
 
     const visitante = await this.prisma.visitante.findUnique({
@@ -70,11 +71,13 @@ export class PublicaService {
 
       if (votoExistente) continue;
 
-      const participacao = await this.prisma.projeto.findFirst({
+      const participacao = await this.prisma.candidato.findFirst({
         where: {
           id_projeto: id_candidato,
-          participantes: {
-            some: { id_visitante },
+          aluno: {
+            participante: {
+              some: { id_visitante },
+            },
           },
         },
       });
