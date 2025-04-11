@@ -9,50 +9,52 @@ export class PublicaController {
   constructor(private readonly publicaService: PublicaService) {}
 
   /**
-   * Registra o voto do convidado em um candidato específico dentro do evento.
+   * Registra o voto do visitante em um projeto específico dentro do evento.
    */
-  @Post('convidado')
-  @ApiOperation({ summary: 'Registrar voto do convidado' })
+  @Post('visitante')
+  @ApiOperation({ summary: 'Registrar voto do visitante' })
   @ApiBody({
     description: 'Dados necessários para registrar um voto',
     schema: {
       type: 'object',
       properties: {
         id_visitante: { type: 'number', example: 1 },
-        id_candidato: { type: 'number', example: 10 },
+        id_projeto: { type: 'number', example: 10 },
         id_evento: { type: 'number', example: 100 },
       },
-      required: ['id_visitante', 'id_candidato', 'id_evento'],
+      required: ['id_visitante', 'id_projeto', 'id_evento'],
     },
   })
   @ApiResponse({ status: 201, description: 'Voto registrado com sucesso.' })
   @ApiResponse({ status: 400, description: 'Erro na validação dos dados.' })
-  async votarConvidado(
+  async votarVisitante(
     @Body('id_visitante') id_visitante: number,
-    @Body('id_candidato') id_candidato: number,
+    @Body('id_projeto') id_projeto: number,
     @Body('id_evento') id_evento: number,
   ) {
-    return this.publicaService.votarConvidado(
+    return this.publicaService.votarVisitante(
       id_visitante,
-      id_candidato,
+      id_projeto,
       id_evento,
     );
   }
 
   /**
-   * Verifica se o convidado pode votar no evento.
+   * Verifica se o visitante pode votar no evento.
    */
-  @Get('convidado/verificacao')
-  @ApiOperation({ summary: 'Verificar se o convidado pode votar' })
+  @Get('visitante/verificacao')
+  @ApiOperation({ summary: 'Verificar se o visitante pode votar' })
   @ApiQuery({ name: 'id_visitante', required: true, example: 1 })
   @ApiQuery({ name: 'id_evento', required: true, example: 100 })
-  @ApiResponse({ status: 200, description: 'Status da elegibilidade do convidado.' })
+  @ApiQuery({ name: 'id_projeto', required: true, example: 10 })
+  @ApiResponse({ status: 200, description: 'Status da elegibilidade do visitante.' })
   @ApiResponse({ status: 400, description: 'Parâmetros inválidos ou ausentes.' })
-  async verificarConvidado(
+  async verificarVisitante(
     @Query('id_visitante') id_visitante: number,
     @Query('id_evento') id_evento: number,
+    @Query('id_projeto') id_projeto: number,
   ) {
-    return this.publicaService.verificarConvidado(id_visitante, id_evento);
+    return this.publicaService.verificarVisitante(id_visitante, id_evento, id_projeto);
   }
 
   /**
@@ -79,9 +81,10 @@ export class PublicaController {
       properties: {
         id_avaliador: { type: 'number', example: 2 },
         id_projeto: { type: 'number', example: 200 },
-        estrelas: { type: 'number', minimum: 1, maximum: 5, example: 4 },
+        estrelas_inovador: { type: 'number', minimum: 1, maximum: 5, example: 4 },
+        estrelas_acolhedor: { type: 'number', minimum: 1, maximum: 5, example: 4 },
       },
-      required: ['id_avaliador', 'id_projeto', 'estrelas'],
+      required: ['id_avaliador', 'id_projeto', 'estrelas_inovador', 'estrelas_acolhedor'],
     },
   })
   @ApiResponse({ status: 201, description: 'Classificação registrada com sucesso.' })
@@ -89,12 +92,14 @@ export class PublicaController {
   async classificarProjeto(
     @Body('id_avaliador') id_avaliador: number,
     @Body('id_projeto') id_projeto: number,
-    @Body('estrelas') estrelas: number,
+    @Body('estrelas_inovador') estrelas_inovador: number,
+    @Body('estrelas_acolhedor') estrelas_acolhedor: number,
   ) {
     return this.publicaService.classificarProjeto(
       id_avaliador,
       id_projeto,
-      estrelas,
+      estrelas_inovador,
+      estrelas_acolhedor,
     );
   }
 
@@ -105,12 +110,14 @@ export class PublicaController {
   @ApiOperation({ summary: 'Verificar se o avaliador pode votar' })
   @ApiQuery({ name: 'id_avaliador', required: true, example: 2 })
   @ApiQuery({ name: 'id_evento', required: true, example: 100 })
+  @ApiQuery({ name: 'id_projeto', required: true, example: 10 })
   @ApiResponse({ status: 200, description: 'Status da elegibilidade do avaliador.' })
   @ApiResponse({ status: 400, description: 'Parâmetros inválidos ou ausentes.' })
   async verificarAvaliador(
     @Query('id_avaliador') id_avaliador: number,
     @Query('id_evento') id_evento: number,
+    @Query('id_projeto') id_projeto: number,
   ) {
-    return this.publicaService.verificarAvaliador(id_avaliador, id_evento);
+    return this.publicaService.verificarAvaliador(id_avaliador, id_evento, id_projeto);
   }
 }
