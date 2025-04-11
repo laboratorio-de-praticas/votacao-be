@@ -20,7 +20,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.enableCors({
-    origin: ["http://192.168.1.103:3000", "http://3.82.243.65:3000", "http://10.67.56.95:3000"],
+    origin: ["http://192.168.1.103:3000", "http://3.82.243.65:3000", "http://10.67.56.95:3000", "http://18.212.16.5:3000"],
     //credentials: true,
     methods: 'GET, POST', // pensar sobre acrescentar a limitacao de headers, exemplo: allowedHeaders: 'Content-Type, Authorization'
   });
