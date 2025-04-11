@@ -11,10 +11,10 @@ export class InternaController {
   constructor(private readonly internaService: InternaService) {}
 
   /**
-   * Registra o voto de um aluno em um candidato dentro de um evento específico.
+   * Registra o voto de um aluno em um representante dentro de um evento específico.
    */
   @Post('confirmacao')
-  @ApiOperation({ summary: 'Registrar voto do aluno' })
+  @ApiOperation({ summary: 'Registrar voto do aluno em um representante' })
   @ApiBody({
     description: 'Dados necessários para registrar um voto',
     type: CriarVotoDto,
@@ -22,20 +22,20 @@ export class InternaController {
   @ApiResponse({ status: 201, description: 'Voto registrado com sucesso.' })
   @ApiResponse({ status: 400, description: 'Erro de validação nos dados enviados.' })
   async votar(@Body() body: CriarVotoDto) {
-    const { idAluno, idCandidato, idEvento } = body;
+    const { idAluno, idRepresentante, idEvento } = body;
 
-    if (!idAluno || !idCandidato || !idEvento) {
+    if (!idAluno || !idRepresentante || !idEvento) {
       throw new BadRequestException('Todos os campos são obrigatórios.');
     }
 
-    return this.internaService.votar(idAluno, idCandidato, idEvento);
+    return this.internaService.votarEmRepresentante(idAluno, idRepresentante, idEvento);
   }
 
   /**
-   * Verifica se um aluno já votou em um determinado evento.
+   * Verifica se um aluno está apto a votar em um determinado evento interno.
    */
   @Get('confirmacao/verificacao')
-  @ApiOperation({ summary: 'Verificar se o aluno já votou' })
+  @ApiOperation({ summary: 'Verificar se o aluno já votou no evento' })
   @ApiQuery({
     name: 'idAluno',
     description: 'ID do aluno para verificar se já votou',
@@ -57,6 +57,6 @@ export class InternaController {
       throw new BadRequestException('Os parâmetros idAluno e idEvento são obrigatórios.');
     }
 
-    return this.internaService.verificarVoto(idAluno, idEvento);
+    return this.internaService.verificarVotoEmEvento(idAluno, idEvento);
   }
 }
