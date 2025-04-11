@@ -25,13 +25,33 @@ async function main() {
     },
   });
 
+  // === USUARIOS ADICIONAIS PARA TESTE ===
+  const usuario3 = await prisma.usuario.create({
+    data: {
+      nome: 'Carlos Souza',
+      senha: 'senha789',
+      email_institucional: 'carlos@exemplo.com',
+      tipo_usuario: 'Interno',
+      status_usuario: 'Ativo',
+    },
+  });
+  const usuario4 = await prisma.usuario.create({
+    data: {
+      nome: 'Maria Oliveira',
+      senha: 'senha101',
+      email_institucional: 'maria@exemplo.com',
+      tipo_usuario: 'Interno',
+      status_usuario: 'Ativo',
+    },
+  });
+
   // === ALUNOS ===
   const aluno1 = await prisma.aluno.create({
     data: {
       fk_id_usuario: usuario1.id,
       foto_url: 'https://img.com/aluno1.jpg',
       data_matricula: new Date('2022-01-10'),
-      curso_semestre: 'Engenharia - 6º semestre',
+      curso_semestre: 'DSM-3',
     },
   });
 
@@ -40,7 +60,26 @@ async function main() {
       fk_id_usuario: usuario2.id,
       foto_url: 'https://img.com/aluno2.jpg',
       data_matricula: new Date('2023-02-15'),
-      curso_semestre: 'Design - 4º semestre',
+      curso_semestre: 'DSM-4',
+    },
+  });
+
+  // === ALUNOS ADICIONAIS PARA TESTE ===
+  const aluno3 = await prisma.aluno.create({
+    data: {
+      fk_id_usuario: usuario3.id,
+      foto_url: 'https://img.com/aluno3.jpg',
+      data_matricula: new Date('2023-03-10'),
+      curso_semestre: 'DSM-3',
+    },
+  });
+
+  const aluno4 = await prisma.aluno.create({
+    data: {
+      fk_id_usuario: usuario4.id,
+      foto_url: 'https://img.com/aluno4.jpg',
+      data_matricula: new Date('2023-03-10'),
+      curso_semestre: 'DSM-4',
     },
   });
 
@@ -85,9 +124,9 @@ async function main() {
       nome_evento: 'Feira 2025',
       descricao_evento: 'Projetos de 2025',
       status_evento: 'Ativo',
-      curso_semestre: 'Engenharia',
+      curso_semestre: 'DSM-3',
       data_inicio: new Date(Date.now()),
-      data_fim: new Date((new Date).setFullYear(2026)),
+      data_fim: new Date(new Date().setFullYear(2026)),
     },
   });
 
@@ -97,9 +136,9 @@ async function main() {
       nome_evento: 'Mostra Design',
       descricao_evento: 'Design criativo',
       status_evento: 'Ativo',
-      curso_semestre: 'Design',
+      curso_semestre: 'DSM-4',
       data_inicio: new Date(Date.now()),
-      data_fim: new Date((new Date()).setFullYear(2026)),
+      data_fim: new Date(new Date().setFullYear(2026)),
     },
   });
 
@@ -119,6 +158,16 @@ async function main() {
       fk_id_evento: evento2.id_evento,
       qrcode: 'QR2',
       RepresentanteSituacao: 'Pendente',
+    },
+  });
+
+  // === REPRESENTANTES ADICIONAIS ===
+  const representante3 = await prisma.representante.create({
+    data: {
+      fk_id_aluno: aluno3.id_aluno,
+      fk_id_evento: evento1.id_evento, // Interno
+      qrcode: 'QR3',
+      RepresentanteSituacao: 'Ativo',
     },
   });
 
@@ -239,4 +288,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-

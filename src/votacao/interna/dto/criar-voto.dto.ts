@@ -9,7 +9,7 @@ export class CriarVotoDto {
 
   @ApiProperty({
     description: 'ID do representante que está recebendo o voto',
-    example: 2,
+    example: 1,
   })
   @IsInt()
   @IsNotEmpty()
@@ -17,7 +17,7 @@ export class CriarVotoDto {
 
   @ApiProperty({
     description: 'ID do evento em que a votação está ocorrendo',
-    example: 3,
+    example: 1,
   })
   @IsInt()
   @IsNotEmpty()
