@@ -10,7 +10,7 @@ export class PublicaService {
     id_projeto: number,
     id_evento: number,
   ): Promise<{ message: string }> {
-    const evento = await this.prisma.eventos.findUnique({
+    const evento = await this.prisma.evento.findUnique({
       where: { id_evento },
       select: { tipo_evento: true, status_evento: true },
     });
@@ -25,7 +25,7 @@ export class PublicaService {
       );
     }
 
-    const visitante = await this.prisma.visitantes.findUnique({
+    const visitante = await this.prisma.visitante.findUnique({
       where: { id_visitante },
     });
 
@@ -33,7 +33,7 @@ export class PublicaService {
       throw new BadRequestException('Visitante não encontrado.');
     }
 
-    const projeto = await this.prisma.projetos.findUnique({
+    const projeto = await this.prisma.projeto.findUnique({
       where: { id_projeto },
     });
 
@@ -41,7 +41,7 @@ export class PublicaService {
       throw new BadRequestException('Projeto não encontrado.');
     }
 
-    const votoExistente = await this.prisma.votosExternos.findFirst({
+    const votoExistente = await this.prisma.votoExterno.findFirst({
       where: {
         fk_id_evento: id_evento,
         fk_id_projeto: id_projeto,
@@ -55,7 +55,7 @@ export class PublicaService {
       );
     }
 
-    await this.prisma.votosExternos.create({
+    await this.prisma.votoExterno.create({
       data: {
         fk_id_evento: id_evento,
         fk_id_projeto: id_projeto,
@@ -71,7 +71,7 @@ export class PublicaService {
     id_evento: number,
     id_projeto: number,
   ): Promise<{ message: string }> {
-    const evento = await this.prisma.eventos.findUnique({
+    const evento = await this.prisma.evento.findUnique({
       where: { id_evento },
     });
 
@@ -83,7 +83,7 @@ export class PublicaService {
       throw new BadRequestException('Este evento não é público.');
     }
 
-    const visitante = await this.prisma.visitantes.findUnique({
+    const visitante = await this.prisma.visitante.findUnique({
       where: { id_visitante },
     });
 
@@ -91,7 +91,7 @@ export class PublicaService {
       throw new BadRequestException('Visitante não encontrado.');
     }
 
-    const voto = await this.prisma.votosExternos.findFirst({
+    const voto = await this.prisma.votoExterno.findFirst({
       where: {
         fk_id_evento: id_evento,
         fk_id_projeto: id_projeto,
@@ -111,7 +111,7 @@ export class PublicaService {
     id_projeto: number,
     id_evento: number,
   ): Promise<{ message: string }> {
-    const evento = await this.prisma.eventos.findUnique({
+    const evento = await this.prisma.evento.findUnique({
       where: { id_evento },
     });
 
@@ -125,7 +125,7 @@ export class PublicaService {
       );
     }
 
-    const avaliador = await this.prisma.avaliadores.findUnique({
+    const avaliador = await this.prisma.avaliador.findUnique({
       where: { id_avaliador },
     });
 
@@ -133,7 +133,7 @@ export class PublicaService {
       throw new BadRequestException('Avaliador não encontrado.');
     }
 
-    const projeto = await this.prisma.projetos.findUnique({
+    const projeto = await this.prisma.projeto.findUnique({
       where: { id_projeto },
     });
 
@@ -141,7 +141,7 @@ export class PublicaService {
       throw new BadRequestException('Projeto não encontrado.');
     }
 
-    const votoExistente = await this.prisma.votosExternos.findFirst({
+    const votoExistente = await this.prisma.votoExterno.findFirst({
       where: {
         fk_id_evento: id_evento,
         fk_id_projeto: id_projeto,
@@ -153,7 +153,7 @@ export class PublicaService {
       throw new BadRequestException('Você já votou neste projeto.');
     }
 
-    await this.prisma.votosExternos.create({
+    await this.prisma.votoExterno.create({
       data: {
         fk_id_evento: id_evento,
         fk_id_projeto: id_projeto,
@@ -169,7 +169,7 @@ export class PublicaService {
     id_evento: number,
     id_projeto: number,
   ): Promise<{ message: string }> {
-    const avaliador = await this.prisma.avaliadores.findUnique({
+    const avaliador = await this.prisma.avaliador.findUnique({
       where: { id_avaliador },
     });
 
@@ -177,7 +177,7 @@ export class PublicaService {
       throw new BadRequestException('Avaliador não encontrado.');
     }
 
-    const voto = await this.prisma.votosExternos.findFirst({
+    const voto = await this.prisma.votoExterno.findFirst({
       where: {
         fk_id_evento: id_evento,
         fk_id_projeto: id_projeto,
@@ -193,21 +193,19 @@ export class PublicaService {
   }
 
   async detalhesProjeto(id_projeto: number) {
-    const projeto = await this.prisma.projetos.findUnique({
+    // Busca os detalhes do projeto
+    const projeto = await this.prisma.projeto.findUnique({
       where: { id_projeto },
       include: {
-        integrantesequipe: {
+        Aluno: {
           include: {
-            Alunos: {
-		include: {
-			Usuarios: true
-		}
-	    },
+            Usuario: true,
           },
         },
         CategoriasProjetos: {
-          include: { Categorias: true },
+          include: { Categoria: true },
         },
+        Avaliacao: true,
       },
     });
 
@@ -215,7 +213,22 @@ export class PublicaService {
       throw new BadRequestException('Projeto não encontrado.');
     }
 
-    return projeto;
+    // Consulta adicional para buscar os integrantes do projeto
+    const integrantes = await this.prisma.aluno.findMany({
+      where: {
+        Projeto: {
+          some: { id_projeto },
+        },
+      },
+      include: {
+        Usuario: true, // Inclui informações do usuário associado ao aluno
+      },
+    });
+
+    return {
+      ...projeto,
+      integrantes,
+    };
   }
 
   async classificarProjeto(
@@ -235,7 +248,7 @@ export class PublicaService {
       );
     }
 
-    const avaliador = await this.prisma.avaliadores.findUnique({
+    const avaliador = await this.prisma.avaliador.findUnique({
       where: { id_avaliador: idAvaliador },
     });
 
@@ -243,7 +256,7 @@ export class PublicaService {
       throw new BadRequestException('Avaliador não encontrado.');
     }
 
-    const avaliacaoExistente = await this.prisma.avaliacoes.findFirst({
+    const avaliacaoExistente = await this.prisma.avaliacao.findFirst({
       where: {
         fk_id_avaliador: idAvaliador,
         fk_id_projeto: idProjeto,
@@ -254,7 +267,7 @@ export class PublicaService {
       throw new BadRequestException('Você já avaliou este projeto.');
     }
 
-    await this.prisma.avaliacoes.create({
+    await this.prisma.avaliacao.create({
       data: {
         fk_id_avaliador: idAvaliador,
         fk_id_projeto: idProjeto,
