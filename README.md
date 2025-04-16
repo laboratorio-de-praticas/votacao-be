@@ -1,3 +1,6 @@
+Here's your updated README.md with the Prisma commands added in the appropriate section:
+
+```markdown
 <p align="center">
   <a href="https://fatecregistro.cps.sp.gov.br/" target="blank"><img src="https://bkpsitecpsnew.blob.core.windows.net/uploadsitecps/sites/40/2024/03/fatec_registro.png" width="300" alt="Fatec Logo" /></a>
 </p>
@@ -55,18 +58,24 @@ PORT=3000
 
 3. Configure as variáveis de ambiente conforme descrito acima.
 
-4. Execute as migrações do banco de dados:
+4. Sincronize o schema do banco de dados e gere o cliente Prisma:
+   ```bash
+   npx prisma db pull
+   npx prisma generate
+   ```
+
+5. Execute as migrações do banco de dados:
    ```bash
    npx prisma migrate dev
    ```
 
-5. (Opcional) Popule o banco com dados de teste:
+6. (Opcional) Popule o banco com dados de teste:
    ```bash
    npx prisma db seed
    ```
    Isso criará alguns registros iniciais para facilitar o desenvolvimento.
 
-6. Inicie o servidor backend:
+7. Inicie o servidor backend:
    ```bash
    npm start
    ```
@@ -83,6 +92,12 @@ Caso prefira utilizar o Docker, siga os passos abaixo:
    docker-compose up -d
    ```
 3. O PostgreSQL estará rodando no contêiner `votacao_postgres` na porta `5432`.
+
+4. Sincronize o schema do banco de dados e gere o cliente Prisma:
+   ```bash
+   npx prisma db pull
+   npx prisma generate
+   ```
 
 Caso precise parar os contêineres:
 ```bash
