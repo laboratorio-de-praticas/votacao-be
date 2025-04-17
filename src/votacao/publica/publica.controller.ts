@@ -1,6 +1,18 @@
-/* eslint-disable prettier/prettier */
-import { Controller, Post, Get, Body, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
+  BadRequestException,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBody,
+  ApiParam,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { PublicaService } from './publica.service';
 
 @ApiTags('Votação Pública')
@@ -40,32 +52,48 @@ export class PublicaController {
   }
 
   /**
-   * Verifica se o visitante pode votar no evento.
+   * Verifica se um visitante pode votar em um evento específico.
    */
-  @Get('visitante/verificacao')
-  @ApiOperation({ summary: 'Verificar se o visitante pode votar' })
-  @ApiQuery({ name: 'id_visitante', required: true, example: 1 })
-  @ApiQuery({ name: 'id_evento', required: true, example: 100 })
-  @ApiQuery({ name: 'id_projeto', required: true, example: 10 })
-  @ApiResponse({ status: 200, description: 'Status da elegibilidade do visitante.' })
-  @ApiResponse({ status: 400, description: 'Parâmetros inválidos ou ausentes.' })
+  @Get('visitante/:idVisitante/:idProjeto/:idEvento')
+  @ApiOperation({ summary: 'Verificar se o visitante pode votar no evento' })
+  @ApiParam({ name: 'idVisitante', description: 'ID do visitante', example: 1 })
+  @ApiParam({ name: 'idProjeto', description: 'ID do projeto', example: 10 })
+  @ApiParam({ name: 'idEvento', description: 'ID do evento', example: 100 })
+  @ApiResponse({
+    status: 200,
+    description: 'Status do voto retornado com sucesso.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Parâmetros obrigatórios ausentes ou inválidos.',
+  })
   async verificarVisitante(
-    @Query('id_visitante') id_visitante: number,
-    @Query('id_evento') id_evento: number,
-    @Query('id_projeto') id_projeto: number,
+    @Param('idVisitante') idVisitante: number,
+    @Param('idProjeto') idProjeto: number,
+    @Param('idEvento') idEvento: number,
   ) {
-    return this.publicaService.verificarVisitante(id_visitante, id_evento, id_projeto);
+    if (!idVisitante || !idProjeto || !idEvento) {
+      throw new BadRequestException('Todos os parâmetros são obrigatórios.');
+    }
+
+    return this.publicaService.verificarVisitante(
+      idVisitante,
+      idEvento,
+      idProjeto,
+    );
   }
 
   /**
    * Obtém os detalhes de um projeto específico, exibindo informações relevantes e botão de votação.
    */
-  @Get('avaliador')
+  @Get('avaliador/:id_projeto')
   @ApiOperation({ summary: 'Obter detalhes de um projeto' })
-  @ApiQuery({ name: 'id_projeto', required: true, example: 200 })
-  @ApiResponse({ status: 200, description: 'Detalhes do projeto retornados com sucesso.' })
-  @ApiResponse({ status: 404, description: 'Projeto não encontrado.' })
-  async detalhesProjeto(@Query('id_projeto') id_projeto: number) {
+  @ApiParam({ name: 'id_projeto', required: true, example: 1 })
+  async detalhesProjeto(@Param('id_projeto') id_projeto: number) {
+    // Use @Param
+    if (!id_projeto) {
+      throw new BadRequestException('O ID do projeto é obrigatório.');
+    }
     return this.publicaService.detalhesProjeto(id_projeto);
   }
 
@@ -81,13 +109,31 @@ export class PublicaController {
       properties: {
         id_avaliador: { type: 'number', example: 2 },
         id_projeto: { type: 'number', example: 200 },
-        estrelas_inovador: { type: 'number', minimum: 1, maximum: 5, example: 4 },
-        estrelas_acolhedor: { type: 'number', minimum: 1, maximum: 5, example: 4 },
+        estrelas_inovador: {
+          type: 'number',
+          minimum: 1,
+          maximum: 5,
+          example: 4,
+        },
+        estrelas_acolhedor: {
+          type: 'number',
+          minimum: 1,
+          maximum: 5,
+          example: 4,
+        },
       },
-      required: ['id_avaliador', 'id_projeto', 'estrelas_inovador', 'estrelas_acolhedor'],
+      required: [
+        'id_avaliador',
+        'id_projeto',
+        'estrelas_inovador',
+        'estrelas_acolhedor',
+      ],
     },
   })
-  @ApiResponse({ status: 201, description: 'Classificação registrada com sucesso.' })
+  @ApiResponse({
+    status: 201,
+    description: 'Classificação registrada com sucesso.',
+  })
   @ApiResponse({ status: 400, description: 'Erro na validação dos dados.' })
   async classificarProjeto(
     @Body('id_avaliador') id_avaliador: number,
@@ -104,20 +150,34 @@ export class PublicaController {
   }
 
   /**
-   * Verifica se um avaliador está apto a votar em um evento.
+   * Verifica se um avaliador pode votar em um evento específico.
    */
-  @Get('avaliador/verificacao')
-  @ApiOperation({ summary: 'Verificar se o avaliador pode votar' })
-  @ApiQuery({ name: 'id_avaliador', required: true, example: 2 })
-  @ApiQuery({ name: 'id_evento', required: true, example: 100 })
-  @ApiQuery({ name: 'id_projeto', required: true, example: 10 })
-  @ApiResponse({ status: 200, description: 'Status da elegibilidade do avaliador.' })
-  @ApiResponse({ status: 400, description: 'Parâmetros inválidos ou ausentes.' })
+  @Get('avaliador/:idAvaliador/:idProjeto/:idEvento')
+  @ApiOperation({ summary: 'Verificar se o avaliador pode votar no evento' })
+  @ApiParam({ name: 'idAvaliador', description: 'ID do avaliador', example: 2 })
+  @ApiParam({ name: 'idProjeto', description: 'ID do projeto', example: 10 })
+  @ApiParam({ name: 'idEvento', description: 'ID do evento', example: 100 })
+  @ApiResponse({
+    status: 200,
+    description: 'Status do voto retornado com sucesso.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Parâmetros obrigatórios ausentes ou inválidos.',
+  })
   async verificarAvaliador(
-    @Query('id_avaliador') id_avaliador: number,
-    @Query('id_evento') id_evento: number,
-    @Query('id_projeto') id_projeto: number,
+    @Param('idAvaliador') idAvaliador: number,
+    @Param('idProjeto') idProjeto: number,
+    @Param('idEvento') idEvento: number,
   ) {
-    return this.publicaService.verificarAvaliador(id_avaliador, id_evento, id_projeto);
+    if (!idAvaliador || !idProjeto || !idEvento) {
+      throw new BadRequestException('Todos os parâmetros são obrigatórios.');
+    }
+
+    return this.publicaService.verificarAvaliador(
+      idAvaliador,
+      idEvento,
+      idProjeto,
+    );
   }
 }
