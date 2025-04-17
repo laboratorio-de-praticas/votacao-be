@@ -4,9 +4,6 @@
 /build
 package-lock.json
 
-#Prisma
-prisma/schema.prisma
-
 # Logs
 logs
 *.log
