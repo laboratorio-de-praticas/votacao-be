@@ -1,6 +1,3 @@
-Here's your updated README.md with the Prisma commands added in the appropriate section:
-
-```markdown
 <p align="center">
   <a href="https://fatecregistro.cps.sp.gov.br/" target="blank"><img src="https://bkpsitecpsnew.blob.core.windows.net/uploadsitecps/sites/40/2024/03/fatec_registro.png" width="300" alt="Fatec Logo" /></a>
 </p>
