@@ -4,14 +4,14 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class InternaService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async votarEmRepresentante(
     id_aluno: number,
     id_representante: number,
     id_evento: number,
   ) {
-    const evento = await this.prisma.evento.findUnique({
+    const evento = await this.prisma.eventos.findUnique({
       where: { id_evento },
     });
 
@@ -29,20 +29,20 @@ export class InternaService {
       throw new BadRequestException('A votação não está aberta neste momento.');
     }
 
-    const aluno = await this.prisma.aluno.findUnique({
+    const aluno = await this.prisma.alunos.findUnique({
       where: { id_aluno },
-      include: { Usuario: true },
+      include: { Usuarios: true },
     });
 
-    if (!aluno || aluno.Usuario.status_usuario !== 'Ativo') {
+    if (!aluno || aluno.Usuarios.status_usuario !== 'Ativo') {
       throw new BadRequestException('Aluno não encontrado ou inativo.');
     }
 
-    const representante = await this.prisma.representante.findUnique({
+    const representante = await this.prisma.representantes.findUnique({
       where: { id_representante },
       include: {
-        Aluno: true,
-        Evento: true,
+        Alunos: true,
+        Eventos: true,
       },
     });
 
@@ -56,7 +56,7 @@ export class InternaService {
       );
     }
 
-    const votoExistente = await this.prisma.votoInterno.findUnique({
+    const votoExistente = await this.prisma.votosInternos.findUnique({
       where: {
         fk_id_evento_fk_id_aluno: {
           fk_id_evento: id_evento,
@@ -75,7 +75,7 @@ export class InternaService {
       );
     }
 
-    await this.prisma.votoInterno.create({
+    await this.prisma.votosInternos.create({
       data: {
         fk_id_aluno: id_aluno,
         fk_id_representante: id_representante,
@@ -87,16 +87,16 @@ export class InternaService {
   }
 
   async verificarVotoEmEvento(id_aluno: number, id_evento: number) {
-    const aluno = await this.prisma.aluno.findUnique({
+    const aluno = await this.prisma.alunos.findUnique({
       where: { id_aluno },
-      include: { Usuario: true },
+      include: { Usuarios: true },
     });
 
-    if (!aluno || aluno.Usuario.status_usuario !== 'Ativo') {
+    if (!aluno || aluno.Usuarios.status_usuario !== 'Ativo') {
       throw new BadRequestException('Aluno não encontrado ou inativo.');
     }
 
-    const evento = await this.prisma.evento.findUnique({
+    const evento = await this.prisma.eventos.findUnique({
       where: { id_evento },
     });
 
@@ -120,7 +120,7 @@ export class InternaService {
       );
     }
 
-    const voto = await this.prisma.votoInterno.findUnique({
+    const voto = await this.prisma.votosInternos.findUnique({
       where: {
         fk_id_evento_fk_id_aluno: {
           fk_id_evento: id_evento,
