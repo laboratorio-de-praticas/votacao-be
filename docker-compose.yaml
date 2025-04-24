@@ -1,14 +1,4 @@
 services:
-  server:
-    container_name: votacao_server
-    build: .
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      PORT: ${PORT}
-    ports:
-      - "${PORT}:${PORT}"
-    depends_on:
-      - postgres
   postgres:
     image: postgres:15
     container_name: votacao_postgres
@@ -26,6 +16,16 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+  server:
+    container_name: votacao_server
+    build: .
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      PORT: ${PORT}
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - postgres
 
 volumes:
   postgres_data:

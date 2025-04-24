@@ -224,6 +224,8 @@ CREATE INDEX IF NOT EXISTS idx_imagens_projeto ON "ImagensProjeto"(projeto_id);
 INSERT INTO "Eventos" (id_evento, nome_evento, tipo_evento, descricao_evento, status_evento, curso_semestre, data_alteracao, data_criacao, data_inicio, data_fim)
 VALUES
 (1, 'Representante de Classe', 'Interno', 'Evento para alunos DSM5', 'Ativo', 'DSM5', NOW(), NOW(), NOW(), NOW() + INTERVAL '1 month'),
+(3, 'Feira de Profissões', 'Externo', 'Evento aberto ao público', 'Ativo', 'DSM5', NOW(), NOW(), NOW(), NOW() + INTERVAL '1 month'),
+(4, 'Feira de Profissões', 'Externo', 'Evento aberto ao público', 'Ativo', 'DSM5', NOW(), NOW(), NOW(), NOW() + INTERVAL '1 month'),
 (2, 'Representante de Classe', 'Interno', 'Evento para alunos GE1', 'Ativo', 'GE1', NOW(), NOW(), NOW(), NOW() + INTERVAL '1 month');
 
 INSERT INTO "Usuarios" (id, nome, data_alteracao, data_criacao, senha, email_institucional, tipo_usuario, status_usuario)
@@ -334,3 +336,15 @@ INSERT INTO "ODS" (descricao) VALUES
 ('ODS 15 - Vida terrestre'),
 ('ODS 16 - Paz, justiça e instituições eficazes'),
 ('ODS 17 - Parcerias e meios de implementação');
+
+INSERT INTO "Visitantes" (nome, telefone, chave_acesso) VALUES
+('Maria Silva', '11987654321', 'ABCD');
+
+INSERT INTO "Visitantes" (nome, telefone, chave_acesso) VALUES
+('João Pereira', '21998765432', 'WXYZ');
+
+INSERT INTO "Avaliadores" (fk_id_usuario, nome, telefone) VALUES
+(1, 'Carla Mendes', '13988776655');
+
+INSERT INTO "Avaliadores" (fk_id_usuario, nome, telefone) VALUES
+(2, 'Pedro Almeida', '11977889900');
