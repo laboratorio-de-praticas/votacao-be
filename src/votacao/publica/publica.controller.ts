@@ -14,7 +14,6 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { PublicaService } from './publica.service';
-
 @ApiTags('Votação Pública')
 @Controller('votacao/publica/confirmacao')
 export class PublicaController {
@@ -108,7 +107,7 @@ export class PublicaController {
       type: 'object',
       properties: {
         id_avaliador: { type: 'number', example: 2 },
-        id_projeto: { type: 'number', example: 200 },
+        id_projeto: { type: 'number', example: 2 },
         estrelas_inovador: {
           type: 'number',
           minimum: 1,
@@ -141,12 +140,12 @@ export class PublicaController {
     @Body('estrelas_inovador') estrelas_inovador: number,
     @Body('estrelas_acolhedor') estrelas_acolhedor: number,
   ) {
-    return this.publicaService.classificarProjeto(
-      id_avaliador,
-      id_projeto,
-      estrelas_inovador,
-      estrelas_acolhedor,
-    );
+					return await this.publicaService.classificarProjeto(
+									id_avaliador,
+									id_projeto,
+									estrelas_inovador,
+									estrelas_acolhedor,
+					);
   }
 
   /**
