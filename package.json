@@ -38,7 +38,8 @@
     "prisma": "^6.5.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "votacao-be-nest": "file:"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

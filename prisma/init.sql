@@ -337,6 +337,11 @@ INSERT INTO "ODS" (descricao) VALUES
 ('ODS 16 - Paz, justiça e instituições eficazes'),
 ('ODS 17 - Parcerias e meios de implementação');
 
+INSERT INTO "Projetos" (id_projeto, titulo, nome_equipe, descricao, foto_url, tlr, cea, turma, ativo, data_criacao, data_alteracao)
+VALUES
+(1, 'Projeto Sustentabilidade', 'Equipe Verde', 'Projeto voltado para práticas sustentáveis.', '/projeto1.jpg', 10, 20, 'DSM5', TRUE, NOW(), NOW()),
+(2, 'Projeto Tecnologia', 'Equipe Tech', 'Projeto para desenvolvimento de soluções tecnológicas.', '/projeto2.jpg', 15, 25, 'DSM5', TRUE, NOW(), NOW());
+
 INSERT INTO "Visitantes" (nome, telefone, chave_acesso) VALUES
 ('Maria Silva', '11987654321', 'ABCD');
 
