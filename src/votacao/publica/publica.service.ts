@@ -241,45 +241,59 @@ export class PublicaService {
     estrelas_inovador: number,
     estrelas_acolhedor: number,
   ): Promise<{ message: string }> {
-    if (
-      estrelas_inovador < 1 ||
-      estrelas_inovador > 5 ||
-      estrelas_acolhedor < 1 ||
-      estrelas_acolhedor > 5
-    ) {
-      throw new BadRequestException(
-        'As classificações devem estar entre 1 e 5 estrelas.',
-      );
-    }
+	  function isNumberInRange(number: number, lowerBound: number, upperBound: number): boolean {
+		  return number >= lowerBound && number <= upperBound;
+	  }
 
-    const avaliador = await this.prisma.avaliadores.findUnique({
-      where: { id_avaliador: idAvaliador },
-    });
+		const estrelas: boolean = isNumberInRange(estrelas_inovador, 1, 5) && isNumberInRange(estrelas_acolhedor, 1, 5);
 
-    if (!avaliador) {
-      throw new BadRequestException('Avaliador não encontrado.');
-    }
+	  if (!estrelas) {
+		  throw new BadRequestException(
+			  'As classificações devem estar entre 1 e 5 estrelas.',
+		  );
+	  }
 
-    const avaliacaoExistente = await this.prisma.avaliacoes.findFirst({
-      where: {
-        fk_id_avaliador: idAvaliador,
-        fk_id_projeto: idProjeto,
-      },
-    });
+	  const avaliador = await this.prisma.avaliadores.findUnique({
+		  where: { id_avaliador: idAvaliador },
+	  });
 
-    if (avaliacaoExistente) {
-      throw new BadRequestException('Você já avaliou este projeto.');
-    }
+	  if (!avaliador) {
+		  throw new BadRequestException('Avaliador não encontrado.');
+	  }
 
-    await this.prisma.avaliacoes.create({
-      data: {
-        fk_id_avaliador: idAvaliador,
-        fk_id_projeto: idProjeto,
-        estrelas_inovador,
-        estrelas_acolhedor,
-      },
-    });
+	  const avaliacaoExistente = await this.prisma.avaliacoes.findFirst({
+		  where: {
+			  fk_id_avaliador: idAvaliador,
+			  fk_id_projeto: idProjeto,
+		  },
+	  });
 
-    return { message: 'Classificação registrada com sucesso!' };
+		const projeto = await this.prisma.projetos.findFirst({
+				where: { id_projeto: idProjeto }
+		});
+
+		if(!projeto) {
+						throw new BadRequestException("Projeto não encontrado.");
+		}
+
+
+	  if (avaliacaoExistente) {
+		  throw new BadRequestException('Você já avaliou este projeto.');
+	  } else if (!avaliacaoExistente && projeto){
+					  await this.prisma.avaliacoes.create({
+						data: {
+										fk_id_avaliador: idAvaliador,
+										fk_id_projeto: idProjeto,
+										estrelas_inovador,
+										estrelas_acolhedor,
+						},
+		});
+
+		return { message: 'Classificação registrada com sucesso!' };
+
+		}
+
+		return { message: "Erro na validação de dados" }
+
   }
 }

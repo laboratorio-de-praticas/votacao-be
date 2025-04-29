@@ -353,3 +353,9 @@ INSERT INTO "Avaliadores" (fk_id_usuario, nome, telefone) VALUES
 
 INSERT INTO "Avaliadores" (fk_id_usuario, nome, telefone) VALUES
 (2, 'Pedro Almeida', '11977889900');
+
+INSERT INTO "Projetos" (titulo, nome_equipe, descricao, tlr, cea, turma)
+VALUES ('Desenvolvimento de Plataforma Educacional Online', 'Inovadores Digitais', 'Criação de uma plataforma de aprendizado interativa com recursos multimídia.', 6, 8, 'Engenharia de Software 2025');
+
+INSERT INTO "Projetos" (titulo, nome_equipe, descricao, foto_url, tlr, cea, turma, ativo)
+VALUES ('Sistema Inteligente de Monitoramento Ambiental', 'Guardiões da Natureza', 'Implementação de um sistema IoT para coleta e análise de dados ambientais em tempo real.', 'https://example.com/foto_monitoramento.jpg', 7, 9, 'Ciências Ambientais 2024', FALSE);
