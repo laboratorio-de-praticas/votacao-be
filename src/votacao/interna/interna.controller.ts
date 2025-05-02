@@ -20,7 +20,6 @@ import {
 import { InternaService } from './interna.service';
 import { CriarVotoDto } from './dto/criar-voto.dto';
 import { VerificarVotoDto } from './dto/verificar-voto.dto';
-import { RepresentanteResponseDto } from './dto/representante-detalhes.dto';
 
 @ApiTags('Votação Interna')
 @Controller('votacao/interna')
@@ -83,23 +82,19 @@ export class InternaController {
    * Obtém os detalhes completos de um representante
    */
   @Get('representante/:id_representante')
-  @ApiOperation({ summary: 'Obter detalhes completos de um representante' })
+  @ApiOperation({
+    summary: 'Obter detalhes de um representante',
+    description:
+      'Retorna informações básicas como nome, foto, curso e situação do representante',
+  })
   @ApiParam({
     name: 'id_representante',
-    type: Number,
+    description: 'ID numérico do representante',
     example: 1,
-    description: 'ID do representante',
-  })
-  @ApiOkResponse({
-    description: 'Detalhes do representante retornados com sucesso',
-    type: RepresentanteResponseDto,
-  })
-  @ApiBadRequestResponse({
-    description: 'ID inválido ou representante não encontrado',
   })
   async detalhesRepresentante(
     @Param('id_representante', ParseIntPipe) id_representante: number,
-  ): Promise<RepresentanteResponseDto> {
+  ) {
     return this.internaService.detalhesRepresentante(id_representante);
   }
 }
