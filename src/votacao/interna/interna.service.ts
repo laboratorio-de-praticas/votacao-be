@@ -4,7 +4,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class InternaService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async votarEmRepresentante(
     id_aluno: number,
@@ -113,7 +113,7 @@ export class InternaService {
       foto_url: representante.Alunos.foto_url,
       curso_semestre: representante.Alunos.curso_semestre,
       descricao_campanha: representante.descricao_campanha,
-      situacao: representante.RepresentanteSituacao,
+      situacao: representante.representantesituacao,
       qrcode: representante.qrcode,
     };
   }
