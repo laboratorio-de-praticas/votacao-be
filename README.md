@@ -11,120 +11,75 @@
 
 ## 📋 Descrição
 
-Sistema seguro para votação de representantes de turma e projetos das feiras FTX/HubTec, integrado com microsserviços de autenticação.
+Sistema completo para votação de representantes de turma e projetos das feiras FTX/HubTec, com dois fluxos distintos:
 
-## 👔 Principais tecnologias utilizadas
+1. **Votação Interna**: Para eleição de representantes de turma (turma 2024-1)
+2. **Votação Pública**: Para projetos das feiras FTX e HubTec com validação por token
 
-- [![Nest.js](https://img.shields.io/badge/-NestJs-ea2845?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/) (v10)
-- [![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/) (ORM)
-- [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/) (v15)
-- [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/) (Conteinerização)
+## 👔 Stack Tecnológica
 
-### Pacotes complementares
-- [![class-validator](https://img.shields.io/badge/class--validator-0.14.0-green?style=flat-square)](https://github.com/typestack/class-validator)
+- [![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/) v10
+- [![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/) v6.5
+- [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/) v15
 
-## 🔧 Fluxogramas do Sistema
+## 🔧 Fluxogramas Principais
 
-### Votação Interna (Representantes)
+### 1. Fluxo de Votação de Representantes
 ```mermaid
 flowchart TD
-    A[Aluno acessa sistema] --> B{Autenticado?}
-    B -->|Sim| C[Consulta turma no CMS]
-    B -->|Não| Z[Redireciona para login]
-    C --> D{É da turma 2024-1?}
-    D -->|Sim| E[Lista candidatos aprovados]
-    D -->|Não| Y[Erro: Turma inválida]
-    E --> F[Seleciona candidato]
-    F --> G[Registra voto]
-    G --> H[Confirmação]
+    A[Aluno acessa tela de votação] --> B[Visualiza lista de candidatos]
+    B --> C[Seleciona candidato]
+    C --> D[Confirma voto]
+    D --> E[Registro no sistema]
+    E --> F[Voto confirmado]
     
-    classDef sucesso fill:#e6f7ff,stroke:#1890ff;
-    classDef erro fill:#fff1f0,stroke:#ff4d4f;
-    class A,B,C,D,E,F,G,H sucesso;
-    class Y,Z erro;
+    classDef fluxo fill:#e6f7ff,stroke:#1890ff;
+    class A,B,C,D,E,F fluxo;
 ```
 
-### Votação Pública (Feira FTX/HubTec)
+### 2. Votação na Feira (Projetos FTX/HubTec)
 ```mermaid
 flowchart TD
-    A[Visitante faz check-in] --> B[Gera token temporário]
-    B --> C[Scan QR Code]
-    C --> D{Token válido?}
-    D -->|Sim| E[Exibe projeto]
-    D -->|Não| X[Erro: Token inválido]
-    E --> F[Registra voto]
-    F --> G[Invalida token para este projeto]
-    G --> H[Confirmação]
-   
-    subgraph Avaliadores
-        AV[Avaliador externo] --> CR[Seleciona critérios]
-        CR --> CO[Adiciona comentário]
-        CO --> VO[Registra avaliação]
-    end
+    A[Visitante faz check-in] --> B[Registra telefone]
+    B --> C[Gera token único]
+    C --> D[Escaneia QR Code]
+    D --> E{Token válido?}
+    E -->|Sim| F[Exibe detalhes do projeto]
+    E -->|Não| X[Erro: Token inválido]
+    F --> G[Permite 1 voto por projeto]
+    G --> H[Invalida token para este projeto]
     
     classDef sucesso fill:#f6ffed,stroke:#52c41a;
-    classDef processo fill:#fff7e6,stroke:#fa8c16;
     classDef erro fill:#fff1f0,stroke:#ff4d4f;
     class A,B,C,D,E,F,G,H sucesso;
-    class AV,CR,CO,VO processo;
     class X erro;
 ```
 
-## 🔧 Configuração do Projeto
-
-<details>
-<summary>🐳 Configuração com Docker</summary>
+## ⚙️ Configuração
 
 ```bash
 # Banco de Dados
 docker run --name votacao-db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=votacao_db -p 5432:5432 -d postgres
 
 # Aplicação
-docker build -t votacao-api .
-docker run -p 3000:3000 --link votacao-db votacao-api
+npm install
+npm run start:dev
 ```
-</details>
 
-<details>
-<summary>🔑 Variáveis de Ambiente</summary>
-
+## 📌 Variáveis de Ambiente
+Utilize como base o arquivo de [Exemplo](.env.example)
 ```env
-POSTGRES_USER="seu_usuario"
-POSTGRES_PASSWORD="sua_senha"
-POSTGRES_DB="votacao_db"
-DATABASE_URL="sua_url"
-PORT=3001
-FRONTEND_URL="http://localhost:3000"
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+POSTGRES_DB=
+DATABASE_URL=
+PORT=
 ```
-</details>
-
-
-## 📌 Integração entre Microsserviços
-
-```mermaid
-flowchart LR
-    CMS["Serviço de CMS"] -->|Dados de Usuários| Votação
-    Autenticação -->|Valida tokens| Votação
-    Votação -->|Registra votos| Banco[(PostgreSQL)]
-    
-    classDef service fill:#f0f0f0,stroke:#666,rounded:5px;
-    class CMS,Autenticação,Votação service;
-    class Banco database;
-```
-
-Principais garantias:
-1. Sincronização automática com CMS
-2. Validação em tempo real com serviço de autenticação
-3. Consistência transacional nos registros
 
 ## 🚀 Execução
-
 ```bash
-# Instalação
-npm install
-
-# Iniciar
-docker compose up
+docker-compose up -d
+npm run start:dev
 ```
 
-Acesse a documentação em [http://localhost:3001/api](http://localhost:3001/api) para ver os endpoints disponíveis.
+Acesse: [http://localhost:3001/api](http://localhost:3001/api) para documentação Swagger
