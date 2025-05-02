@@ -4,7 +4,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class InternaService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async votarEmRepresentante(
     id_aluno: number,
@@ -84,6 +84,76 @@ export class InternaService {
     });
 
     return { message: 'Voto registrado com sucesso!' };
+  }
+
+  async detalhesRepresentante(id_representante: number) {
+    // Busca os detalhes do representante com todas as relações necessárias
+    const representante = await this.prisma.representantes.findUnique({
+      where: { id_representante },
+      include: {
+        Alunos: {
+          include: {
+            Usuarios: {
+              select: {
+                id: true,
+                nome: true,
+                email_institucional: true,
+                status_usuario: true,
+              },
+            },
+          },
+        },
+        Eventos: {
+          select: {
+            id_evento: true,
+            nome_evento: true,
+            curso_semestre: true,
+            data_inicio: true,
+            data_fim: true,
+          },
+        },
+        VotosInternos: {
+          select: {
+            id_voto: true,
+            data_criacao: true,
+            Alunos: {
+              select: {
+                id_aluno: true,
+                Usuarios: {
+                  select: {
+                    nome: true,
+                  },
+                },
+              },
+            },
+          },
+          take: 10, // Limita a 10 votos recentes
+          orderBy: {
+            data_criacao: 'desc',
+          },
+        },
+      },
+    });
+
+    if (!representante) {
+      throw new BadRequestException('Representante não encontrado.');
+    }
+
+    // Conta o total de votos recebidos
+    const totalVotos = await this.prisma.votosInternos.count({
+      where: {
+        fk_id_representante: id_representante,
+      },
+    });
+
+    // Formata a resposta
+    return {
+      ...representante,
+      totalVotos,
+      votosRecentes: representante.VotosInternos,
+      // Remove a propriedade VotosInternos do objeto principal
+      VotosInternos: undefined,
+    };
   }
 
   async verificarVotoEmEvento(id_aluno: number, id_evento: number) {

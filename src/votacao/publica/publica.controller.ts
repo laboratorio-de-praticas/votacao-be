@@ -85,7 +85,7 @@ export class PublicaController {
   /**
    * Obtém os detalhes de um projeto específico, exibindo informações relevantes e botão de votação.
    */
-  @Get('avaliador/:id_projeto')
+  @Get('detalhes/:id_projeto')
   @ApiOperation({ summary: 'Obter detalhes de um projeto' })
   @ApiParam({ name: 'id_projeto', required: true, example: 1 })
   async detalhesProjeto(@Param('id_projeto') id_projeto: number) {
@@ -140,12 +140,12 @@ export class PublicaController {
     @Body('estrelas_inovador') estrelas_inovador: number,
     @Body('estrelas_acolhedor') estrelas_acolhedor: number,
   ) {
-					return await this.publicaService.classificarProjeto(
-									id_avaliador,
-									id_projeto,
-									estrelas_inovador,
-									estrelas_acolhedor,
-					);
+    return await this.publicaService.classificarProjeto(
+      id_avaliador,
+      id_projeto,
+      estrelas_inovador,
+      estrelas_acolhedor,
+    );
   }
 
   /**

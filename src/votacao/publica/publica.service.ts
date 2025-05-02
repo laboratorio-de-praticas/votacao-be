@@ -3,7 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class PublicaService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async votarVisitante(
     id_visitante: number,
@@ -201,8 +201,8 @@ export class PublicaService {
           include: {
             Alunos: {
               include: {
-                Usuarios: true
-              }
+                Usuarios: true,
+              },
             },
           },
         },
@@ -221,7 +221,7 @@ export class PublicaService {
     const integrantes = await this.prisma.alunos.findMany({
       where: {
         integrantesequipe: {
-          some: { Projetos: { id_projeto } }
+          some: { Projetos: { id_projeto } },
         },
       },
       include: {
@@ -241,59 +241,62 @@ export class PublicaService {
     estrelas_inovador: number,
     estrelas_acolhedor: number,
   ): Promise<{ message: string }> {
-	  function isNumberInRange(number: number, lowerBound: number, upperBound: number): boolean {
-		  return number >= lowerBound && number <= upperBound;
-	  }
+    function isNumberInRange(
+      number: number,
+      lowerBound: number,
+      upperBound: number,
+    ): boolean {
+      return number >= lowerBound && number <= upperBound;
+    }
 
-		const estrelas: boolean = isNumberInRange(estrelas_inovador, 1, 5) && isNumberInRange(estrelas_acolhedor, 1, 5);
+    const estrelas: boolean =
+      isNumberInRange(estrelas_inovador, 1, 5) &&
+      isNumberInRange(estrelas_acolhedor, 1, 5);
 
-	  if (!estrelas) {
-		  throw new BadRequestException(
-			  'As classificações devem estar entre 1 e 5 estrelas.',
-		  );
-	  }
+    if (!estrelas) {
+      throw new BadRequestException(
+        'As classificações devem estar entre 1 e 5 estrelas.',
+      );
+    }
 
-	  const avaliador = await this.prisma.avaliadores.findUnique({
-		  where: { id_avaliador: idAvaliador },
-	  });
+    const avaliador = await this.prisma.avaliadores.findUnique({
+      where: { id_avaliador: idAvaliador },
+    });
 
-	  if (!avaliador) {
-		  throw new BadRequestException('Avaliador não encontrado.');
-	  }
+    if (!avaliador) {
+      throw new BadRequestException('Avaliador não encontrado.');
+    }
 
-	  const avaliacaoExistente = await this.prisma.avaliacoes.findFirst({
-		  where: {
-			  fk_id_avaliador: idAvaliador,
-			  fk_id_projeto: idProjeto,
-		  },
-	  });
+    const avaliacaoExistente = await this.prisma.avaliacoes.findFirst({
+      where: {
+        fk_id_avaliador: idAvaliador,
+        fk_id_projeto: idProjeto,
+      },
+    });
 
-		const projeto = await this.prisma.projetos.findFirst({
-				where: { id_projeto: idProjeto }
-		});
+    const projeto = await this.prisma.projetos.findFirst({
+      where: { id_projeto: idProjeto },
+    });
 
-		if(!projeto) {
-						throw new BadRequestException("Projeto não encontrado.");
-		}
+    if (!projeto) {
+      throw new BadRequestException('Projeto não encontrado.');
+    }
 
+    if (avaliacaoExistente) {
+      throw new BadRequestException('Você já avaliou este projeto.');
+    } else if (!avaliacaoExistente && projeto) {
+      await this.prisma.avaliacoes.create({
+        data: {
+          fk_id_avaliador: idAvaliador,
+          fk_id_projeto: idProjeto,
+          estrelas_inovador,
+          estrelas_acolhedor,
+        },
+      });
 
-	  if (avaliacaoExistente) {
-		  throw new BadRequestException('Você já avaliou este projeto.');
-	  } else if (!avaliacaoExistente && projeto){
-					  await this.prisma.avaliacoes.create({
-						data: {
-										fk_id_avaliador: idAvaliador,
-										fk_id_projeto: idProjeto,
-										estrelas_inovador,
-										estrelas_acolhedor,
-						},
-		});
+      return { message: 'Classificação registrada com sucesso!' };
+    }
 
-		return { message: 'Classificação registrada com sucesso!' };
-
-		}
-
-		return { message: "Erro na validação de dados" }
-
+    return { message: 'Erro na validação de dados' };
   }
 }
