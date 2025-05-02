@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import {
   Controller,
   Post,
@@ -7,6 +6,7 @@ import {
   BadRequestException,
   Param,
   ValidationPipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -14,10 +14,13 @@ import {
   ApiBody,
   ApiResponse,
   ApiParam,
+  ApiOkResponse,
+  ApiBadRequestResponse,
 } from '@nestjs/swagger';
 import { InternaService } from './interna.service';
 import { CriarVotoDto } from './dto/criar-voto.dto';
 import { VerificarVotoDto } from './dto/verificar-voto.dto';
+import { RepresentanteResponseDto } from './dto/representante-detalhes.dto';
 
 @ApiTags('Votação Interna')
 @Controller('votacao/interna')
@@ -81,18 +84,22 @@ export class InternaController {
    */
   @Get('representante/:id_representante')
   @ApiOperation({ summary: 'Obter detalhes completos de um representante' })
-  @ApiParam({ name: 'id_representante', required: true, example: 1 })
-  @ApiResponse({
-    status: 200,
-    description: 'Detalhes do representante retornados com sucesso',
+  @ApiParam({
+    name: 'id_representante',
+    type: Number,
+    example: 1,
+    description: 'ID do representante',
   })
-  @ApiResponse({
-    status: 400,
-    description: 'ID do representante inválido ou não encontrado',
+  @ApiOkResponse({
+    description: 'Detalhes do representante retornados com sucesso',
+    type: RepresentanteResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'ID inválido ou representante não encontrado',
   })
   async detalhesRepresentante(
     @Param('id_representante', ParseIntPipe) id_representante: number,
-  ) {
+  ): Promise<RepresentanteResponseDto> {
     return this.internaService.detalhesRepresentante(id_representante);
   }
 }
