@@ -7,120 +7,116 @@
 <a href="https://www.instagram.com/fatecregistro/" target="_blank"><img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Fatec Registro Instagram" /></a>
 </p>
 
-<h1 align="center">Votação</h1>
+<h1 align="center">Sistema de Votação</h1>
 
-## 📖 Descrição do Projeto
+## 📋 Descrição
 
-Este projeto consiste no desenvolvimento de um sistema de votação para a faculdade, permitindo dois tipos de votação:
+Sistema seguro para votação de representantes de turma e projetos das feiras FTX/HubTec, integrado com microsserviços de autenticação.
 
-- **Votação interna e segura** para escolha de representantes de turma.
-- **Votação pública** para eleger o melhor projeto das feiras tecnológicas **FTX e HubTec**.
+## 👔 Principais tecnologias utilizadas
 
-O sistema deve ser seguro, acessível e funcional tanto para usuários internos (alunos e professores) quanto para o público externo. Além disso, o sistema contará com **dashboards e relatórios** detalhados para garantir transparência e permitir auditorias.
+- [![Nest.js](https://img.shields.io/badge/-NestJs-ea2845?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/) (v10)
+- [![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/) (ORM)
+- [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/) (v15)
+- [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/) (Conteinerização)
 
-## 🛠️ Tecnologias Utilizadas
+### Pacotes complementares
+- [![class-validator](https://img.shields.io/badge/class--validator-0.14.0-green?style=flat-square)](https://github.com/typestack/class-validator)
 
-- **Back-end**: TypeScript | NestJS
-- **Banco de Dados**: PostgreSQL | Prisma ORM
+## 🔧 Fluxograma do Sistema
 
-## ⚙️ Como Rodar o Projeto
+```mermaid
+flowchart TD
+    subgraph Votação Interna
+        A1[Candidato se registra] --> B1[Validação via CMS]
+        B1 --> C1[Aprovação pendente]
+        C1 -- Aprovado --> D1[Disponível para votação]
+        V1[Eleitor autenticado] --> F1[Verificação de turma]
+        F1 -- Turma válida --> G1[Seleciona candidato]
+        G1 --> H1[Registra voto]
+    end
 
-### 🔧 Pré-requisitos
+    subgraph Votação Pública
+        A2[Visitante faz check-in] --> B2[Gera token único]
+        B2 --> C2[Scan QR Code]
+        C2 --> D2[Valida token]
+        D2 -- Válido --> E2[Exibe projeto]
+        E2 --> F2[Registra voto]
+        F2 --> G2[Invalida token para projeto]
+        
+        Avaliador[Avaliador Externo] --> Crit[Seleciona critérios]
+        Crit --> Coment[Comentário opcional]
+    end
 
-Antes de começar, certifique-se de ter instalado:
+    classDef votacao fill:#e6f3ff,stroke:#3385ff;
+    classDef processo fill:#ffe6e6,stroke:#ff3333;
+    class A1,B1,C1,D1,V1,F1,G1,H1,A2,B2,C2,D2,E2,F2,G2,Avaliador,Crit,Coment processo;
+    class Votação_Interna,Votação_Pública votacao;
+```
 
-- [Node.js](https://nodejs.org/)
-- [PostgreSQL](https://www.postgresql.org/) ou Docker
+**Legenda:**
+- `Verde`: Fluxo principal
+- `Vermelho`: Pontos de validação crítica
+- `Azul`: Sub-sistemas
 
-### 📌 Configuração do `.env`
+## 🔧 Configuração do Projeto
 
-Crie um arquivo `.env` na raiz do projeto e adicione as seguintes variáveis:
+<details>
+<summary>🐳 Configuração com Docker</summary>
+
+```bash
+# Banco de Dados
+docker run --name votacao-db -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin -e POSTGRES_DB=votacao -p 5432:5432 -d postgres
+
+# Aplicação
+docker build -t votacao-api .
+docker run -p 3000:3000 --link votacao-db votacao-api
+```
+</details>
+
+<details>
+<summary>🔑 Variáveis de Ambiente</summary>
 
 ```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/votacao_db
-PORT=3000
+DATABASE_URL="postgresql://admin:admin@localhost:5432/votacao?schema=public"
+AUTH_SERVICE_URL="http://autenticacao-service"
+VOTACAO_ABERTA="true"
+TOKEN_SECRET="sua_chave_secreta"
+```
+</details>
+
+## 🛡️ Regras de Segurança
+
+- Toda votação interna utiliza o serviço de autenticação externo
+- Tokens temporários para votação pública com validade de 12h
+- Validação de IP para prevenção de ataques DDoS
+- Criptografia de votos usando SHA-256
+
+## 📌 Pontos de Atenção
+
+```mermaid
+flowchart LR
+    CMS -- Sincroniza dados --> Votação
+    Autenticação -- Valida tokens --> Votação
+    Votação -- Registra votos --> BancoDados[(PostgreSQL)]
+    
+    classDef service fill:#f0f0f0,stroke:#666;
+    class CMS,Autenticação,Votação service;
 ```
 
-### 🚀 Instalação e Execução
+Este diagrama mostra a integração entre os microsserviços. Precisamos garantir que:
+1. O serviço de CMS sempre envie dados atualizados
+2. A autenticação valide tokens em tempo real
+3. O serviço de votação mantenha consistência transacional
 
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/laboratorio-de-praticas/votacao-be.git
-   ```
+## 🚀 Execução
 
-2. Instale as dependências do backend:
-   ```bash
-   npm install
-   ```
-
-3. Configure as variáveis de ambiente conforme descrito acima.
-
-4. Sincronize o schema do banco de dados e gere o cliente Prisma:
-   ```bash
-   npx prisma db pull
-   npx prisma generate
-   ```
-
-5. Execute as migrações do banco de dados:
-   ```bash
-   npx prisma migrate dev
-   ```
-
-6. (Opcional) Popule o banco com dados de teste:
-   ```bash
-   npx prisma db seed
-   ```
-   Isso criará alguns registros iniciais para facilitar o desenvolvimento.
-
-7. Inicie o servidor backend:
-   ```bash
-   npm start
-   ```
-
-O backend estará rodando em `http://localhost:3000`.
-
-## 🐳 Rodando com Docker
-
-Caso prefira utilizar o Docker, siga os passos abaixo:
-
-1. Certifique-se de ter o **Docker** e **Docker Compose** instalados.
-2. No terminal, na raiz do projeto, execute o comando:
-   ```bash
-   docker-compose up -d
-   ```
-3. O PostgreSQL estará rodando no contêiner `votacao_postgres` na porta `5432`.
-
-4. Sincronize o schema do banco de dados e gere o cliente Prisma:
-   ```bash
-   npx prisma db pull
-   npx prisma generate
-   ```
-
-Caso precise parar os contêineres:
 ```bash
-docker-compose down
+# Instalação
+npm install
+
+# Iniciar
+docker compose up
 ```
 
-## 🔍 Entendendo o Sistema
-
-### 🎓 Votação dos Representantes
-
-- Candidatos se inscrevem no sistema com o e-mail institucional.
-- Apenas alunos da mesma turma podem votar (cada aluno pode votar apenas em um candidato).
-- Candidatos indicam sua turma de ingresso ao se inscreverem.
-- Após a inscrição, a candidatura ficará pendente até aprovação pelos superiores.
-
-### 🏆 Votação dos Projetos na Feira
-
-- A votação será feita através de um **QR Code** disponível na bancada de cada equipe.
-- Cada visitante poderá votar em quantos projetos quiser, desde que seja um único voto por projeto.
-- Visitantes deverão fazer um **check-in** na recepção da feira com seu telefone.
-- Para votar, o visitante informará seu telefone para validação.
-
-📌 **Desenvolvido para proporcionar uma votação segura e transparente!**
-
-## 📌 Documentação da API
-
-A documentação completa da API, incluindo detalhes sobre os endpoints disponíveis, pode ser acessada no Swagger:
-
-🔗 [Swagger UI - Documentação da API](http://localhost:3000/api)
+Acesse a documentação em [http://localhost:3001/api](http://localhost:3001/api) para ver os endpoints disponíveis.
