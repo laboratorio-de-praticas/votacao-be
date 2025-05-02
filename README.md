@@ -23,41 +23,52 @@ Sistema seguro para votação de representantes de turma e projetos das feiras F
 ### Pacotes complementares
 - [![class-validator](https://img.shields.io/badge/class--validator-0.14.0-green?style=flat-square)](https://github.com/typestack/class-validator)
 
-## 🔧 Fluxograma do Sistema
+## 🔧 Fluxogramas do Sistema
 
+### Votação Interna (Representantes)
 ```mermaid
 flowchart TD
-    subgraph Votação Interna
-        A1[Candidato se registra] --> B1[Validação via CMS]
-        B1 --> C1[Aprovação pendente]
-        C1 -- Aprovado --> D1[Disponível para votação]
-        V1[Eleitor autenticado] --> F1[Verificação de turma]
-        F1 -- Turma válida --> G1[Seleciona candidato]
-        G1 --> H1[Registra voto]
-    end
-
-    subgraph Votação Pública
-        A2[Visitante faz check-in] --> B2[Gera token único]
-        B2 --> C2[Scan QR Code]
-        C2 --> D2[Valida token]
-        D2 -- Válido --> E2[Exibe projeto]
-        E2 --> F2[Registra voto]
-        F2 --> G2[Invalida token para projeto]
-        
-        Avaliador[Avaliador Externo] --> Crit[Seleciona critérios]
-        Crit --> Coment[Comentário opcional]
-    end
-
-    classDef votacao fill:#e6f3ff,stroke:#3385ff;
-    classDef processo fill:#ffe6e6,stroke:#ff3333;
-    class A1,B1,C1,D1,V1,F1,G1,H1,A2,B2,C2,D2,E2,F2,G2,Avaliador,Crit,Coment processo;
-    class Votação_Interna,Votação_Pública votacao;
+    A[Aluno acessa sistema] --> B{Autenticado?}
+    B -->|Sim| C[Consulta turma no CMS]
+    B -->|Não| Z[Redireciona para login]
+    C --> D{É da turma 2024-1?}
+    D -->|Sim| E[Lista candidatos aprovados]
+    D -->|Não| Y[Erro: Turma inválida]
+    E --> F[Seleciona candidato]
+    F --> G[Registra voto]
+    G --> H[Confirmação]
+    
+    classDef sucesso fill:#e6f7ff,stroke:#1890ff;
+    classDef erro fill:#fff1f0,stroke:#ff4d4f;
+    class A,B,C,D,E,F,G,H sucesso;
+    class Y,Z erro;
 ```
 
-**Legenda:**
-- `Verde`: Fluxo principal
-- `Vermelho`: Pontos de validação crítica
-- `Azul`: Sub-sistemas
+### Votação Pública (Feira FTX/HubTec)
+```mermaid
+flowchart TD
+    A[Visitante faz check-in] --> B[Gera token temporário]
+    B --> C[Scan QR Code]
+    C --> D{Token válido?}
+    D -->|Sim| E[Exibe projeto]
+    D -->|Não| X[Erro: Token inválido]
+    E --> F[Registra voto]
+    F --> G[Invalida token para este projeto]
+    G --> H[Confirmação]
+   
+    subgraph Avaliadores
+        AV[Avaliador externo] --> CR[Seleciona critérios]
+        CR --> CO[Adiciona comentário]
+        CO --> VO[Registra avaliação]
+    end
+    
+    classDef sucesso fill:#f6ffed,stroke:#52c41a;
+    classDef processo fill:#fff7e6,stroke:#fa8c16;
+    classDef erro fill:#fff1f0,stroke:#ff4d4f;
+    class A,B,C,D,E,F,G,H sucesso;
+    class AV,CR,CO,VO processo;
+    class X erro;
+```
 
 ## 🔧 Configuração do Projeto
 
@@ -66,7 +77,7 @@ flowchart TD
 
 ```bash
 # Banco de Dados
-docker run --name votacao-db -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=admin -e POSTGRES_DB=votacao -p 5432:5432 -d postgres
+docker run --name votacao-db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=votacao_db -p 5432:5432 -d postgres
 
 # Aplicação
 docker build -t votacao-api .
@@ -78,36 +89,33 @@ docker run -p 3000:3000 --link votacao-db votacao-api
 <summary>🔑 Variáveis de Ambiente</summary>
 
 ```env
-DATABASE_URL="postgresql://admin:admin@localhost:5432/votacao?schema=public"
-AUTH_SERVICE_URL="http://autenticacao-service"
-VOTACAO_ABERTA="true"
-TOKEN_SECRET="sua_chave_secreta"
+POSTGRES_USER="seu_usuario"
+POSTGRES_PASSWORD="sua_senha"
+POSTGRES_DB="votacao_db"
+DATABASE_URL="sua_url"
+PORT=3001
+FRONTEND_URL="http://localhost:3000"
 ```
 </details>
 
-## 🛡️ Regras de Segurança
 
-- Toda votação interna utiliza o serviço de autenticação externo
-- Tokens temporários para votação pública com validade de 12h
-- Validação de IP para prevenção de ataques DDoS
-- Criptografia de votos usando SHA-256
-
-## 📌 Pontos de Atenção
+## 📌 Integração entre Microsserviços
 
 ```mermaid
 flowchart LR
-    CMS -- Sincroniza dados --> Votação
-    Autenticação -- Valida tokens --> Votação
-    Votação -- Registra votos --> BancoDados[(PostgreSQL)]
+    CMS["Serviço de CMS"] -->|Dados de Usuários| Votação
+    Autenticação -->|Valida tokens| Votação
+    Votação -->|Registra votos| Banco[(PostgreSQL)]
     
-    classDef service fill:#f0f0f0,stroke:#666;
+    classDef service fill:#f0f0f0,stroke:#666,rounded:5px;
     class CMS,Autenticação,Votação service;
+    class Banco database;
 ```
 
-Este diagrama mostra a integração entre os microsserviços. Precisamos garantir que:
-1. O serviço de CMS sempre envie dados atualizados
-2. A autenticação valide tokens em tempo real
-3. O serviço de votação mantenha consistência transacional
+Principais garantias:
+1. Sincronização automática com CMS
+2. Validação em tempo real com serviço de autenticação
+3. Consistência transacional nos registros
 
 ## 🚀 Execução
 
