@@ -146,6 +146,7 @@ export class PublicaService {
     idEvento: number,
     estrelas_inovador: number,
     estrelas_acolhedor: number,
+    comentario?: string,
   ) {
     const evento = await this.prisma.eventos.findUnique({
       where: { id_evento: idEvento },
@@ -211,6 +212,7 @@ export class PublicaService {
           fk_id_projeto: idProjeto,
           estrelas_inovador,
           estrelas_acolhedor,
+          comentario: comentario ?? null,
         },
       });
       await this.prisma.votosExternos.create({

@@ -121,6 +121,7 @@ export class PublicaController {
           maximum: 5,
           example: 4,
         },
+        comentario: { type: 'string', example: 'Ótimo projeto!' },
       },
       required: [
         'id_avaliador',
@@ -142,6 +143,7 @@ export class PublicaController {
     @Body('id_evento') id_evento: number,
     @Body('estrelas_inovador') estrelas_inovador: number,
     @Body('estrelas_acolhedor') estrelas_acolhedor: number,
+    @Body('comentario') comentario: string,
   ) {
     return await this.publicaService.classificarProjeto(
       id_avaliador,
@@ -149,6 +151,7 @@ export class PublicaController {
       id_evento,
       estrelas_inovador,
       estrelas_acolhedor,
+      comentario,
     );
   }
 
