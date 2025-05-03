@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class InternaService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async votarEmRepresentante(
     id_aluno: number,
@@ -134,18 +133,12 @@ export class InternaService {
       where: { id_evento },
     });
 
-    if (
-      !evento ||
-      !evento.data_inicio ||
-      !evento.data_fim ||
-      evento.tipo_evento !== 'Interno'
-    ) {
-      throw new BadRequestException('Evento inválido.');
+    if (!evento || evento.status_evento !== 'Ativo') {
+      throw new BadRequestException('O evento não está ativo.');
     }
 
-    const agora = new Date();
-    if (agora < evento.data_inicio || agora > evento.data_fim) {
-      throw new BadRequestException('O evento não está em andamento.');
+    if (!evento || evento.tipo_evento !== 'Interno') {
+      throw new BadRequestException('Evento inválido.');
     }
 
     if (aluno.curso_semestre !== evento.curso_semestre) {

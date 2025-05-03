@@ -1,17 +1,17 @@
 import {
-  Controller,
-  Post,
-  Get,
-  Body,
-  Param,
   BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
 } from '@nestjs/common';
 import {
-  ApiTags,
-  ApiOperation,
   ApiBody,
+  ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { PublicaService } from './publica.service';
 @ApiTags('Votação Pública')
@@ -108,6 +108,7 @@ export class PublicaController {
       properties: {
         id_avaliador: { type: 'number', example: 2 },
         id_projeto: { type: 'number', example: 2 },
+        id_evento: { type: 'number', example: 2 },
         estrelas_inovador: {
           type: 'number',
           minimum: 1,
@@ -124,6 +125,7 @@ export class PublicaController {
       required: [
         'id_avaliador',
         'id_projeto',
+        'id_evento',
         'estrelas_inovador',
         'estrelas_acolhedor',
       ],
@@ -137,12 +139,14 @@ export class PublicaController {
   async classificarProjeto(
     @Body('id_avaliador') id_avaliador: number,
     @Body('id_projeto') id_projeto: number,
+    @Body('id_evento') id_evento: number,
     @Body('estrelas_inovador') estrelas_inovador: number,
     @Body('estrelas_acolhedor') estrelas_acolhedor: number,
   ) {
     return await this.publicaService.classificarProjeto(
       id_avaliador,
       id_projeto,
+      id_evento,
       estrelas_inovador,
       estrelas_acolhedor,
     );

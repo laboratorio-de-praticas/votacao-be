@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
@@ -70,7 +70,7 @@ export class PublicaService {
     id_visitante: number,
     id_evento: number,
     id_projeto: number,
-  ): Promise<{ message: string }> {
+  ) {
     const evento = await this.prisma.eventos.findUnique({
       where: { id_evento },
     });
@@ -99,76 +99,21 @@ export class PublicaService {
       },
     });
 
-    if (voto) {
-      throw new BadRequestException('Você já votou neste projeto.');
-    }
-
-    return { message: 'Visitante apto a votar.' };
-  }
-
-  async votarAvaliador(
-    id_avaliador: number,
-    id_projeto: number,
-    id_evento: number,
-  ): Promise<{ message: string }> {
-    const evento = await this.prisma.eventos.findUnique({
-      where: { id_evento },
-    });
-
-    if (!evento || evento.status_evento !== 'Ativo') {
-      throw new BadRequestException('O evento não está ativo.');
-    }
-
-    if (evento.tipo_evento !== 'Externo') {
-      throw new BadRequestException(
-        'Avaliadores não podem votar em eventos internos.',
-      );
-    }
-
-    const avaliador = await this.prisma.avaliadores.findUnique({
-      where: { id_avaliador },
-    });
-
-    if (!avaliador) {
-      throw new BadRequestException('Avaliador não encontrado.');
-    }
-
-    const projeto = await this.prisma.projetos.findUnique({
-      where: { id_projeto },
-    });
-
-    if (!projeto) {
-      throw new BadRequestException('Projeto não encontrado.');
-    }
-
-    const votoExistente = await this.prisma.votosExternos.findFirst({
-      where: {
-        fk_id_evento: id_evento,
-        fk_id_projeto: id_projeto,
-        fk_id_avaliador: id_avaliador,
-      },
-    });
-
-    if (votoExistente) {
-      throw new BadRequestException('Você já votou neste projeto.');
-    }
-
-    await this.prisma.votosExternos.create({
-      data: {
-        fk_id_evento: id_evento,
-        fk_id_projeto: id_projeto,
-        fk_id_avaliador: id_avaliador,
-      },
-    });
-
-    return { message: 'Voto do avaliador registrado com sucesso!' };
+    return {
+      id_evento,
+      id_visitante,
+      voto_confirmado: !!voto,
+      message: voto
+        ? 'Visitante já votou neste evento.'
+        : 'Visitante apto a votar.',
+    };
   }
 
   async verificarAvaliador(
     id_avaliador: number,
     id_evento: number,
     id_projeto: number,
-  ): Promise<{ message: string }> {
+  ) {
     const avaliador = await this.prisma.avaliadores.findUnique({
       where: { id_avaliador },
     });
@@ -185,62 +130,37 @@ export class PublicaService {
       },
     });
 
-    if (voto) {
-      throw new BadRequestException('Você já votou neste projeto.');
-    }
-
-    return { message: 'Avaliador apto a votar.' };
-  }
-
-  async detalhesProjeto(id_projeto: number) {
-    // Busca os detalhes do projeto
-    const projeto = await this.prisma.projetos.findUnique({
-      where: { id_projeto },
-      include: {
-        integrantesequipe: {
-          include: {
-            Alunos: {
-              include: {
-                Usuarios: true,
-              },
-            },
-          },
-        },
-        CategoriasProjetos: {
-          include: { Categorias: true },
-        },
-        Avaliacoes: true,
-      },
-    });
-
-    if (!projeto) {
-      throw new BadRequestException('Projeto não encontrado.');
-    }
-
-    // Consulta adicional para buscar os integrantes do projeto
-    const integrantes = await this.prisma.alunos.findMany({
-      where: {
-        integrantesequipe: {
-          some: { Projetos: { id_projeto } },
-        },
-      },
-      include: {
-        Usuarios: true, // Inclui informações do usuário associado ao aluno
-      },
-    });
-
     return {
-      ...projeto,
-      integrantes,
+      id_evento,
+      id_avaliador,
+      voto_confirmado: !!voto,
+      message: voto
+        ? 'Avaliador já votou neste evento.'
+        : 'Avaliador apto a votar.',
     };
   }
 
   async classificarProjeto(
     idAvaliador: number,
     idProjeto: number,
+    idEvento: number,
     estrelas_inovador: number,
     estrelas_acolhedor: number,
-  ): Promise<{ message: string }> {
+  ) {
+    const evento = await this.prisma.eventos.findUnique({
+      where: { id_evento: idEvento },
+    });
+
+    if (!evento || evento.status_evento !== 'Ativo') {
+      throw new BadRequestException('O evento não está ativo.');
+    }
+
+    if (evento.tipo_evento !== 'Externo') {
+      throw new BadRequestException(
+        'Avaliadores não podem votar em eventos internos.',
+      );
+    }
+
     function isNumberInRange(
       number: number,
       lowerBound: number,
@@ -293,10 +213,60 @@ export class PublicaService {
           estrelas_acolhedor,
         },
       });
+      await this.prisma.votosExternos.create({
+        data: {
+          fk_id_evento: idEvento,
+          fk_id_projeto: idProjeto,
+          fk_id_avaliador: idAvaliador,
+        },
+      });
 
       return { message: 'Classificação registrada com sucesso!' };
     }
 
     return { message: 'Erro na validação de dados' };
+  }
+
+  async detalhesProjeto(id_projeto: number) {
+    // Busca os detalhes do projeto
+    const projeto = await this.prisma.projetos.findUnique({
+      where: { id_projeto },
+      include: {
+        integrantesequipe: {
+          include: {
+            Alunos: {
+              include: {
+                Usuarios: true,
+              },
+            },
+          },
+        },
+        CategoriasProjetos: {
+          include: { Categorias: true },
+        },
+        Avaliacoes: true,
+      },
+    });
+
+    if (!projeto) {
+      throw new BadRequestException('Projeto não encontrado.');
+    }
+
+    // Consulta adicional para buscar os integrantes do projeto
+    const integrantes = await this.prisma.alunos.findMany({
+      where: {
+        integrantesequipe: {
+          some: { Projetos: { id_projeto } },
+        },
+      },
+      include: {
+        Usuarios: true, // Inclui informações do usuário associado ao aluno
+      },
+    });
+
+    return {
+      ...projeto,
+      integrantes,
+    };
   }
 }
