@@ -337,11 +337,6 @@ INSERT INTO "ODS" (descricao) VALUES
 ('ODS 16 - Paz, justiça e instituições eficazes'),
 ('ODS 17 - Parcerias e meios de implementação');
 
-INSERT INTO "Projetos" (id_projeto, titulo, nome_equipe, descricao, foto_url, tlr, cea, turma, ativo, data_criacao, data_alteracao)
-VALUES
-(1, 'Projeto Sustentabilidade', 'Equipe Verde', 'Projeto voltado para práticas sustentáveis.', '/projeto1.jpg', 10, 20, 'DSM5', TRUE, NOW(), NOW()),
-(2, 'Projeto Tecnologia', 'Equipe Tech', 'Projeto para desenvolvimento de soluções tecnológicas.', '/projeto2.jpg', 15, 25, 'DSM5', TRUE, NOW(), NOW());
-
 INSERT INTO "Visitantes" (nome, telefone, chave_acesso) VALUES
 ('Maria Silva', '11987654321', 'ABCD');
 
@@ -354,8 +349,8 @@ INSERT INTO "Avaliadores" (fk_id_usuario, nome, telefone) VALUES
 INSERT INTO "Avaliadores" (fk_id_usuario, nome, telefone) VALUES
 (2, 'Pedro Almeida', '11977889900');
 
-INSERT INTO "Projetos" (titulo, nome_equipe, descricao, tlr, cea, turma)
-VALUES ('Desenvolvimento de Plataforma Educacional Online', 'Inovadores Digitais', 'Criação de uma plataforma de aprendizado interativa com recursos multimídia.', 6, 8, 'Engenharia de Software 2025');
+INSERT INTO "Projetos" (id_projeto, titulo, nome_equipe, descricao, foto_url, tlr, cea, turma)
+VALUES (1, 'Desenvolvimento de Plataforma Educacional Online', 'Inovadores Digitais', 'Criação de uma plataforma de aprendizado interativa com recursos multimídia.', '/projeto1.jpg', 6, 8, 'Engenharia de Software 2025');
 
-INSERT INTO "Projetos" (titulo, nome_equipe, descricao, foto_url, tlr, cea, turma, ativo)
-VALUES ('Sistema Inteligente de Monitoramento Ambiental', 'Guardiões da Natureza', 'Implementação de um sistema IoT para coleta e análise de dados ambientais em tempo real.', 'https://example.com/foto_monitoramento.jpg', 7, 9, 'Ciências Ambientais 2024', FALSE);
+INSERT INTO "Projetos" (id_projeto, titulo, nome_equipe, descricao, foto_url, tlr, cea, turma, ativo)
+VALUES (2, 'Sistema Inteligente de Monitoramento Ambiental', 'Guardiões da Natureza', 'Implementação de um sistema IoT para coleta e análise de dados ambientais em tempo real.', '/foto_monitoramento.jpg', 7, 9, 'Ciências Ambientais 2024', FALSE);
