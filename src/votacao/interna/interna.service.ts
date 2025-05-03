@@ -95,6 +95,7 @@ export class InternaService {
             Usuarios: {
               select: {
                 nome: true,
+                email_institucional: true,
               },
             },
           },
@@ -110,6 +111,7 @@ export class InternaService {
     return {
       id_representante: representante.id_representante,
       nome: representante.Alunos.Usuarios.nome,
+      email: representante.Alunos.Usuarios.email_institucional,
       foto_url: representante.Alunos.foto_url,
       curso_semestre: representante.Alunos.curso_semestre,
       descricao_campanha: representante.descricao_campanha,
