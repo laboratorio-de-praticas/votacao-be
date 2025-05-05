@@ -20,7 +20,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.enableCors({
-    origin: process.env.FRONTEND_URL,
+    origin: '*',
     credentials: true,
     methods: 'GET, POST', // pensar sobre acrescentar a limitacao de headers, exemplo: allowedHeaders: 'Content-Type, Authorization'
   });
