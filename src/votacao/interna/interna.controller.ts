@@ -7,6 +7,7 @@ import {
   Param,
   ValidationPipe,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -14,14 +15,14 @@ import {
   ApiBody,
   ApiResponse,
   ApiParam,
-  ApiOkResponse,
-  ApiBadRequestResponse,
 } from '@nestjs/swagger';
 import { InternaService } from './interna.service';
 import { CriarVotoDto } from './dto/criar-voto.dto';
 import { VerificarVotoDto } from './dto/verificar-voto.dto';
+import { AuthGuard } from './auth/interna.auth';
 
 @ApiTags('Votação Interna')
+@UseGuards(AuthGuard)
 @Controller('votacao/interna')
 export class InternaController {
   constructor(private readonly internaService: InternaService) {}
