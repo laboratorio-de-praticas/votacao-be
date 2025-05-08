@@ -36,7 +36,7 @@ export class AuthGuard implements CanActivate {
         },
       );
 
-      if (response.status !== 200 || !response.data.id) {
+      if (response.status !== 200 || !response.data.email) {
         throw new ForbiddenException(
           'Resposta inválida do serviço de autenticação',
         );
